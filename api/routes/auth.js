@@ -20,10 +20,10 @@ const signToken = (_id) => {
     )
 }
 
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
     const { nombre, rut } = req.body
     console.log(rut)
-    Pacientes.findOne({ PAC_PAC_Rut: rut }).exec()
+    await Pacientes.findOne({ PAC_PAC_Rut: rut }).exec()
         .then(paciente => {
             if(!paciente) {
                 return res.status(403).send('Warning! Autodestrucción iniciada')
