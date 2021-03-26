@@ -1,0 +1,31 @@
+{
+  "name": "api-login",
+  "version": "1.0.0",
+  "description": "This README would normally document whatever steps are necessary to get your application up and running.",
+  "main": "index.js",
+  "dependencies": {
+    "@babel/polyfill": "^7.12.1",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-boom": "^3.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.12.2"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.13.10",
+    "@babel/core": "^7.13.10",
+    "@babel/preset-env": "^7.13.12",
+    "jest": "^26.6.3"
+  },
+  "scripts": {
+    "build": "rm -rf public && mkdir public && echo 'Custom Build' > ./public/index.html"
+    
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://pafonbu@bitbucket.org/DesarrolloHRA/api-login.git"
+  },
+  "author": "Pablo Fontecilla Busch",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/DesarrolloHRA/api-login#readme"
+}
