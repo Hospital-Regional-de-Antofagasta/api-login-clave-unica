@@ -51,3 +51,5 @@ Thumbs.db
 # Compilacion de codigo con babel
 lib
 
+
+.vercel
