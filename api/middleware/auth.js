@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-const Pacientes = require('../models/Paciente')
+const Pacientes = require('../models/Pacientes')
 
 const secret = 'mi-secreto'
 
