@@ -13,11 +13,8 @@ const isAuthenticated = (req, res, next) => {
             return res.sendStatus(403)
         }
         const { _id } = decoded
-        Pacientes.findOne({ _id }).exec()
-            .then(paciente => {
-                req.paciente = paciente
-                next()
-            })
+        req.idPaciente = _id
+        next()
     })
 }
 
