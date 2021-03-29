@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 const Pacientes = require('../models/Pacientes')
 
-const secret = 'mi-secreto'
+const secret = process.env.JWT_SECRET
 
 const isAuthenticated = (req, res, next) => {
     const token = req.headers.authorization
