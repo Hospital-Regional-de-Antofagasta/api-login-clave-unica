@@ -1,5 +1,5 @@
 const auth = require('./auth')
-describe('src', () => {
+describe('api', () => {
     describe('auth', () => {
         it('should return token', () => {
             const user = {
@@ -13,7 +13,7 @@ describe('src', () => {
                 status: jest.fn().mockReturnThis(),
                 send: jest.fn(),
             }
-            auth ().login(req, res)
+            auth().login(req, res)
             expect(res.status.mock.calls).toEqual([
                 [201]
             ])
