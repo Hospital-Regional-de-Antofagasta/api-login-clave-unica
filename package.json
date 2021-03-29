@@ -18,8 +18,11 @@
     "jest": "^26.6.3"
   },
   "scripts": {
-    "build": "rm -rf public && mkdir public && echo 'Custom Build' > ./public/index.html"
-    
+    "build": "rm -rf public && mkdir public && echo 'Custom Build' > ./public/index.html",
+    "babel-build": "./node_modules/.bin/babel . -d dist --ignore node_modules,test,.vscode",
+    "dev-build": "nodemon --exec babel-node ./src/index",
+    "clean": "rimraf ./build",
+    "test": "jest"
   },
   "repository": {
     "type": "git",

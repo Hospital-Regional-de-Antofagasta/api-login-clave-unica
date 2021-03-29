@@ -1,9 +1,6 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
-// console.log('Estado Coneccion', mongoose.connection.readyState);
-
-
 const Paciente = mongoose.model('Pacientes', new Schema ({
     PAC_PAC_Numero: Number,
     PAC_PAC_Rut: String,
