@@ -1,7 +1,7 @@
 const express = require('express')
 const crypto = require('crypto')
 const jwt = require('jsonwebtoken')
-const Pacientes = require('../models/Paciente')
+const Pacientes = require('../models/Pacientes')
 
 const router = express.Router()
 
