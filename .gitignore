@@ -48,3 +48,8 @@ Thumbs.db
 *.mov
 *.wmv
 
+# Compilacion de codigo con babel
+lib
+
+
+.vercel
