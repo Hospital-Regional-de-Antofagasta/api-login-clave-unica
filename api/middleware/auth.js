@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 const Pacientes = require('../models/Pacientes')
 
-const secret = 'mi-secreto'
+const secret = process.env.JWT_SECRET
 
 const isAuthenticated = (req, res, next) => {
     const token = req.headers.authorization
@@ -13,11 +13,8 @@ const isAuthenticated = (req, res, next) => {
             return res.sendStatus(403)
         }
         const { _id } = decoded
-        Pacientes.findOne({ _id }).exec()
-            .then(paciente => {
-                req.paciente = paciente
-                next()
-            })
+        req.idPaciente = _id
+        next()
     })
 }
 
