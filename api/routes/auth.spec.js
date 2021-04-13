@@ -2,9 +2,7 @@ const supertest = require('supertest')
 const app = require('../index')
 const mongoose = require('mongoose')
 const Pacientes = require('../models/Pacientes')
-const ConfigApiLogin = require('../models/ConfigApiLogin')
 const pacientesSeed = require('../testSeeds/pacientesSeed.json')
-const { mensajesLogin } = require('../config')
 
 const request = supertest(app)
 
@@ -50,7 +48,7 @@ describe('Endpoints auth', () => {
                 .send(pacienteNoIngresado)
             // verificar que retorno el status code correcto
             expect(response.status).toBe(403)
-            expect(response.body.respuesta).toBe(mensajesLogin.forbiddenAccess)
+            expect(response.body.respuesta).toBeTruthy()
 
             done()
         })
@@ -62,6 +60,20 @@ describe('Endpoints auth', () => {
             // verificar que retorno el status code correcto
             expect(response.status).toBe(200)
             expect(response.body.token).toBeTruthy()
+
+            done()
+        })
+        // test si bd vacia
+        it('Should not generate token', async (done) => {
+            // borrar pacientes bd
+            await Pacientes.deleteMany()
+            // ejecutar endpoint
+            const response = await request.post('/hra/auth/login')
+                .send(pacienteIngresado)
+            // verificar que retorno el status code correcto
+            expect(response.status).toBe(403)
+            expect(response.body.respuesta).toBeTruthy()
+            expect(response.body.respuesta).toBe(mensajesLogin.forbiddenAccess)
 
             done()
         })
