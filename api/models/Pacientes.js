@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
-const Paciente = mongoose.model('Pacientes', new Schema ({
+const Paciente = mongoose.model('paciente', new Schema ({
     PAC_PAC_Numero: Number,
     PAC_PAC_Rut: String,
     PAC_PAC_ApellPater: String,
@@ -18,6 +18,6 @@ const Paciente = mongoose.model('Pacientes', new Schema ({
     PAC_PAC_TelefonoMovil: String,
     PAC_PAC_CorreoCuerpo: String,
     PAC_PAC_CorreoExtension: String,
-}), 'PAC_Paciente')
+}))
 
 module.exports = Paciente
