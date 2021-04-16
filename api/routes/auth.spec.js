@@ -3,10 +3,9 @@ const app = require('../index')
 const mongoose = require('mongoose')
 const Pacientes = require('../models/Pacientes')
 const pacientesSeed = require('../testSeeds/pacientesSeed.json')
+const { mensajesLogin } = require('../config')
 
 const request = supertest(app)
-
-const token = process.env.HRADB_A_MONGODB_SECRET
 
 beforeEach(async () => {
     await mongoose.disconnect()
