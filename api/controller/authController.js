@@ -23,8 +23,7 @@ exports.login = async (req, res) => {
         return res.status(200).send(
             {
                 token: token,
-                // refresh_token
-                // token_expire_in
+                refresh_token: token,
             }
         )
     } catch (error) {
