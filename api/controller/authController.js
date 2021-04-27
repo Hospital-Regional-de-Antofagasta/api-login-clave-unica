@@ -25,9 +25,6 @@ exports.login = async (req, res) => {
         })
 
         const refreshTokenKey = uuidv4()
-        const refreshToken = signToken({ refreshTokenKey })
-
-        await saveRefreshToken(refreshTokenKey, paciente, ipAddress)
 
         const oldRefreshToken = await RefreshToken.findOne({ paciente: paciente._id, revoked: null }).exec()
 
@@ -37,6 +34,9 @@ exports.login = async (req, res) => {
             oldRefreshToken.replacedByKey = refreshTokenKey
             await oldRefreshToken.save()
         }
+
+        const refreshToken = signToken({ refreshTokenKey })
+        await saveRefreshToken(refreshTokenKey, paciente, ipAddress)
 
         return res.status(200).send(
             {
