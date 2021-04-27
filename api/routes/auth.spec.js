@@ -80,7 +80,7 @@ describe('Endpoints auth', () => {
         })
         it('Should not generate new token if the refresh token is invalid', async (done) => {
             const response = await request.post('/hra/auth/refresh_token')
-                .set('Authorization', 'no-token')
+                .send({ refresh_token: 'no-token' })
 
             expect(response.status).toBe(401)
             expect(response.body.respuesta).toBe(mensajes.unauthorizedRefresh)
@@ -89,9 +89,9 @@ describe('Endpoints auth', () => {
         })
         it('Should not generate new token if the refresh token is not on the db', async (done) => {
             await RefreshToken.deleteMany()
-            const token = jwt.sign({ refreshTokenKey: 'I am not in the db'}, secreto)
+            const refresh_token = jwt.sign({ refreshTokenKey: 'I am not in the db'}, secreto)
             const response = await request.post('/hra/auth/refresh_token')
-                .set('Authorization', token)
+                .send({ refresh_token })
 
             expect(response.status).toBe(401)
             expect(response.body.respuesta).toBe(mensajes.unauthorizedRefresh)
@@ -99,9 +99,9 @@ describe('Endpoints auth', () => {
             done()
         })
         it('Should not generate new token if the refresh token has been revoked', async (done) => {
-            const token = jwt.sign({ refreshTokenKey: 'I am revoked' }, secreto)
+            const refresh_token = jwt.sign({ refreshTokenKey: 'I am revoked' }, secreto)
             const response = await request.post('/hra/auth/refresh_token')
-                .set('Authorization', token)
+                .send({ refresh_token })
 
             expect(response.status).toBe(401)
             expect(response.body.respuesta).toBe(mensajes.unauthorizedRefresh)
@@ -109,9 +109,9 @@ describe('Endpoints auth', () => {
             done()
         })
         it('Should generate new token', async (done) => {
-            const token = jwt.sign({ refreshTokenKey: 'I am a valid key'}, secreto)
+            const refresh_token = jwt.sign({ refreshTokenKey: 'I am a valid key'}, secreto)
             const response = await request.post('/hra/auth/refresh_token')
-                .set('Authorization', token)
+                .send({ refresh_token })
 
             expect(response.status).toBe(200)
             expect(response.body.token).toBeTruthy()

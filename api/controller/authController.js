@@ -42,7 +42,7 @@ exports.login = async (req, res) => {
 
 exports.refreshToken = async (req, res) => {
     try {
-        const refreshToken = req.headers.authorization
+        const refreshToken = req.body.refresh_token
         const ipAddress = req.ip
 
         if (!refreshToken)
