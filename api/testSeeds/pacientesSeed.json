@@ -1,5 +1,6 @@
 [
     {
+        "_id":"60832a43c8a4d50009607cab",
         "PAC_PAC_Numero":"16",
         "PAC_PAC_Rut":"10771131-7",
         "PAC_PAC_ApellPater":"LAZO",
@@ -18,6 +19,7 @@
         "PAC_PAC_CorreoExtension":""
     },
     {
+        "_id":"60832a43c8a4d50009608cab",
         "PAC_PAC_Numero":"19",
         "PAC_PAC_Rut":"17724699-9",
         "PAC_PAC_ApellPater":"RIVERA",
@@ -36,6 +38,7 @@
         "PAC_PAC_CorreoExtension":""
     },
     {
+        "_id":"60832a43c8a4d50009609cab",
         "PAC_PAC_Numero":"20",
         "PAC_PAC_Rut":"18502151-3",
         "PAC_PAC_ApellPater":"RIVERA",
