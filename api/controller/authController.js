@@ -29,6 +29,15 @@ exports.login = async (req, res) => {
 
         await saveRefreshToken(refreshTokenKey, paciente, ipAddress)
 
+        const oldRefreshToken = await RefreshToken.findOne({ paciente: paciente._id, revoked: null }).exec()
+
+        if (oldRefreshToken) {
+            oldRefreshToken.revoked = Date.now()
+            oldRefreshToken.revokedByIp = ipAddress
+            oldRefreshToken.replacedByKey = refreshTokenKey
+            await oldRefreshToken.save()
+        }
+
         return res.status(200).send(
             {
                 token: token,
