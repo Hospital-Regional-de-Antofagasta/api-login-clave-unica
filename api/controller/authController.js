@@ -7,7 +7,7 @@ const { mensajes } = require('../config')
 const secret = process.env.JWT_SECRET
 
 // const expiresIn = 60 * 15 * 1 * 1 // seconds, minutes, hours, days
-const expiresIn = 60 * 2 * 1 * 1 // seconds, minutes, hours, days
+const expiresIn = 60 * 1 * 1 * 1 // seconds, minutes, hours, days
 
 const refreshTokenExpiresIn = 60 * 60 * 24 * 365 // seconds, minutes, hours, days
 
