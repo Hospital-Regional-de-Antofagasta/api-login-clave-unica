@@ -52,7 +52,11 @@ exports.login = async (req, res) => {
 exports.refreshToken = async (req, res) => {
     try {
         const refreshToken = req.body.refresh_token
-        const ipAddress = req.ip
+        // const ipAddress = req.ip
+        const ipAddress = req.headers['x-forwarded-for'] || req.connection.remoteAddress
+        console.log('req.ip', req.ip)
+        console.log("req.headers['x-forwarded-for']", req.headers['x-forwarded-for'])
+        console.log('req.connection.remoteAddress', req.connection.remoteAddress)
 
         if (!refreshToken)
             return res.status(401).send({ respuesta: mensajes.unauthorizedRefresh })
