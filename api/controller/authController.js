@@ -23,7 +23,7 @@ exports.login = async (req, res) => {
         const token = signToken({
             _id: paciente._id,
             PAC_PAC_Numero: paciente.PAC_PAC_Numero
-        })
+        }, expiresIn)
 
         const refreshTokenKey = uuidv4()
 
@@ -36,7 +36,7 @@ exports.login = async (req, res) => {
             await oldRefreshToken.save()
         }
 
-        const refreshToken = signToken({ refreshTokenKey })
+        const refreshToken = signToken({ refreshTokenKey }, refreshTokenExpiresIn)
         await saveRefreshToken(refreshTokenKey, paciente, ipAddress)
 
         return res.status(200).send(
@@ -85,13 +85,13 @@ exports.refreshToken = async (req, res) => {
         oldRefreshToken.replacedByKey = newRefreshTokenKey
         await oldRefreshToken.save()
 
-        const newRefreshToken = signToken({ newRefreshTokenKey })
+        const newRefreshToken = signToken({ newRefreshTokenKey }, refreshTokenExpiresIn)
         await saveRefreshToken(newRefreshTokenKey, paciente, ipAddress)
 
         const token = signToken({
             _id: paciente._id,
             PAC_PAC_Numero: paciente.PAC_PAC_Numero
-        })
+        }, expiresIn)
 
         return res.status(200).send(
             {
@@ -104,7 +104,7 @@ exports.refreshToken = async (req, res) => {
     }
 }
 
-const signToken = (content) => {
+const signToken = (content, expiresIn) => {
     return jwt.sign(content, secret, { expiresIn: expiresIn })
 }
 
