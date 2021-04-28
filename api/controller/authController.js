@@ -6,14 +6,15 @@ const { mensajes } = require('../config')
 
 const secret = process.env.JWT_SECRET
 
-const expiresIn = 60 * 15 * 1 * 1 // seconds, minutes, hours, days
+// const expiresIn = 60 * 15 * 1 * 1 // seconds, minutes, hours, days
+const expiresIn = 60 * 2 * 1 * 1 // seconds, minutes, hours, days
 
 const refreshTokenExpiresIn = 60 * 60 * 24 * 365 // seconds, minutes, hours, days
 
 exports.login = async (req, res) => {
     try {
         const { nombre, rut, token_clave_unica } = req.body
-        const ipAddress = req.ip
+        const ipAddress = req.headers['x-forwarded-for'] || req.connection.remoteAddress
         // TODO: validar que el token de la clave unica sea real
         const paciente = await Pacientes.findOne({ PAC_PAC_Rut: rut }).exec()
 
@@ -52,11 +53,7 @@ exports.login = async (req, res) => {
 exports.refreshToken = async (req, res) => {
     try {
         const refreshToken = req.body.refresh_token
-        // const ipAddress = req.ip
         const ipAddress = req.headers['x-forwarded-for'] || req.connection.remoteAddress
-        console.log('req.ip', req.ip)
-        console.log("req.headers['x-forwarded-for']", req.headers['x-forwarded-for'])
-        console.log('req.connection.remoteAddress', req.connection.remoteAddress)
 
         if (!refreshToken)
             return res.status(401).send({ respuesta: mensajes.unauthorizedRefresh })
