@@ -1,12 +1,12 @@
 [
     {
-        "paciente": "60832a43c8a4d50009607cab",
+        "paciente_id": "60832a43c8a4d50009607cab",
         "key": "encryptedKey",
         "created": "2021-04-26T03:00:00.000Z",
         "createdByIp": "10.67.84.255"
     },
     {
-        "paciente": "60832a43c8a4d50009608cab",
+        "paciente_id": "60832a43c8a4d50009608cab",
         "key": "I am revoked",
         "created": "2021-04-26T03:00:00.000Z",
         "createdByIp": "10.67.84.255",
@@ -15,7 +15,7 @@
         "replacedByKey": "I am a valid key"
     },
     {
-        "paciente": "60832a43c8a4d50009608cab",
+        "paciente_id": "60832a43c8a4d50009608cab",
         "key": "I am a valid key",
         "created": "2021-04-27T03:00:00.000Z",
         "createdByIp": "10.67.84.255"

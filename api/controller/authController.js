@@ -73,7 +73,12 @@ exports.refreshToken = async (req, res) => {
         if (!oldRefreshToken)
             return res.status(401).send({ respuesta: mensajes.unauthorizedRefresh })
 
-        const { paciente } = oldRefreshToken
+        const { paciente_id } = oldRefreshToken
+
+        const paciente = await Pacientes.findById(paciente_id).exec()
+
+        if (!paciente)
+            return res.status(401).send({ respuesta: mensajes.unauthorized })
 
         if (oldRefreshToken.revoked)
             return res.status(401).send({ respuesta: mensajes.unauthorizedRefresh })
@@ -110,7 +115,7 @@ const signToken = (content, expiresIn) => {
 
 const saveRefreshToken = async (key, paciente, ipAddress) => {
     const refreshToken = {
-        paciente: paciente._id,
+        paciente_id: paciente._id,
         key: key,
         createdByIp: ipAddress,
     }
