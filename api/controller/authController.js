@@ -16,13 +16,13 @@ exports.login = async (req, res) => {
         const { nombre, rut, token_clave_unica } = req.body
         const ipAddress = req.headers['x-forwarded-for'] || req.connection.remoteAddress
         // TODO: validar que el token de la clave unica sea real
-        const paciente = await Pacientes.findOne({ PAC_PAC_Rut: rut }).exec()
+        const paciente = await Pacientes.findOne({ rut: rut }).exec()
 
         if (!paciente) return res.status(401).send({ respuesta: mensajes.unauthorized })
 
         const token = signToken({
             _id: paciente._id,
-            PAC_PAC_Numero: paciente.PAC_PAC_Numero
+            numeroPaciente: paciente.numeroPaciente
         }, expiresIn)
 
         const refreshTokenKey = uuidv4()
@@ -95,7 +95,7 @@ exports.refreshToken = async (req, res) => {
 
         const token = signToken({
             _id: paciente._id,
-            PAC_PAC_Numero: paciente.PAC_PAC_Numero
+            numeroPaciente: paciente.numeroPaciente
         }, expiresIn)
 
         return res.status(200).send(
