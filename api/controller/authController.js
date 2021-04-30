@@ -90,7 +90,7 @@ exports.refreshToken = async (req, res) => {
         oldRefreshToken.replacedByKey = newRefreshTokenKey
         await oldRefreshToken.save()
 
-        const newRefreshToken = signToken({ newRefreshTokenKey }, refreshTokenExpiresIn)
+        const newRefreshToken = signToken({ refreshTokenKey: newRefreshTokenKey }, refreshTokenExpiresIn)
         await saveRefreshToken(newRefreshTokenKey, paciente, ipAddress)
 
         const token = signToken({
