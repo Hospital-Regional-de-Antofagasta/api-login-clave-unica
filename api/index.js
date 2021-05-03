@@ -12,10 +12,10 @@ mongoose.connect(process.env.MONGO_URI, {useNewUrlParser: true, useUnifiedTopolo
 
 loadConfig()
 
-app.use('/hra/auth', auth)
-
-app.get('/*', (req, res) => {
+app.get('', (req, res) => {
     res.status(200).send('Hola Mundo!!')
 })
+
+app.use('/hra/auth', auth)
 
 module.exports = app
