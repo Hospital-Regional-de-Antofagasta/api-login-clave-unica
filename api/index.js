@@ -14,4 +14,8 @@ loadConfig()
 
 app.use('/hra/auth', auth)
 
+app.get('/*', (req, res) => {
+    res.status(200).send('Hola Mundo!!')
+})
+
 module.exports = app
