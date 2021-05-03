@@ -1,14 +1,15 @@
 const ConfigApiLogin = require('./models/ConfigApiLogin')
 
-let mensajesLogin = {
-    forbiddenAccess: 'No se encuentra en los registros del hospital.',
+let mensajes = {
+    unauthorized: 'No se encuentra en los registros del hospital.',
+    unauthorizedRefresh: 'Su sesión ha expirado.',
     serverError: 'Se produjo un error.',
 }
 
 const loadConfig = async () => {
     try {
         const config = await ConfigApiLogin.findOne().exec()
-        mensajesLogin = config.mensajesLogin
+        mensajes = config.mensajes
     } catch (error) {
 
     }
@@ -16,5 +17,5 @@ const loadConfig = async () => {
 
 module.exports = {
     loadConfig,
-    mensajesLogin
+    mensajes
  }

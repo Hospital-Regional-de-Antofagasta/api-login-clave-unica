@@ -1,37 +1,36 @@
 const supertest = require('supertest')
 const app = require('../index')
+const jwt = require('jsonwebtoken')
 const mongoose = require('mongoose')
 const Pacientes = require('../models/Pacientes')
+const RefreshToken = require('../models/RefreshToken')
 const pacientesSeed = require('../testSeeds/pacientesSeed.json')
-const { mensajesLogin } = require('../config')
+const refreshTokensSeed = require('../testSeeds/refreshTokensSeed.json')
+const { mensajes } = require('../config')
 
 const request = supertest(app)
 
+const secreto = process.env.JWT_SECRET
+
 beforeEach(async () => {
     await mongoose.disconnect()
-    // conectarse a la bd de testing
     await mongoose.connect(`${process.env.MONGO_URI_TEST}auth_test`, { useNewUrlParser: true, useUnifiedTopology: true })
-    // cargar los seeds a la bd
-    for (const pacienteSeed of pacientesSeed) {
-      await Pacientes.create(pacienteSeed)
-    }
+    await Pacientes.create(pacientesSeed)
+    await RefreshToken.create(refreshTokensSeed)
 });
 
 afterEach(async () => {
-    // borrar el contenido de la colleccion en la bd
     await Pacientes.deleteMany()
-    // cerrar la coneccion a la bd
+    await RefreshToken.deleteMany()
     await mongoose.connection.close()
 })
 
-// paciente para realizar las pruebas
 const pacienteNoIngresado = {
     nombre: 'nombre',
     rut: '1-1',
     token_clave_unica: '1234',
 }
 
-// paciente para realizar las pruebas
 const pacienteIngresado = {
     nombre: 'nombre',
     rut: '10771131-7',
@@ -40,39 +39,83 @@ const pacienteIngresado = {
 
 describe('Endpoints auth', () => {
     describe('Generate token for user', () => {
-        // test si no es paciente
-        it('Should not generate token', async (done) => {
-            // ejecutar endpoint
+        it('Should not generate token for paciente that does not exist', async (done) => {
             const response = await request.post('/hra/auth/login')
                 .send(pacienteNoIngresado)
-            // verificar que retorno el status code correcto
-            expect(response.status).toBe(403)
-            expect(response.body.respuesta).toBeTruthy()
+
+            expect(response.status).toBe(401)
+            expect(response.body.respuesta).toBe(mensajes.unauthorized)
 
             done()
         })
-        // test si es paciente
-        it('Should generate token', async (done) => {
-            // ejecutar endpoint
+        it('Should generate token for paciente that exists', async (done) => {
             const response = await request.post('/hra/auth/login')
                 .send(pacienteIngresado)
-            // verificar que retorno el status code correcto
+
             expect(response.status).toBe(200)
             expect(response.body.token).toBeTruthy()
+            expect(response.body.refresh_token).toBeTruthy()
 
             done()
         })
-        // test si bd vacia
-        it('Should not generate token', async (done) => {
-            // borrar pacientes bd
+        it('Should not generate token with empty db', async (done) => {
             await Pacientes.deleteMany()
-            // ejecutar endpoint
             const response = await request.post('/hra/auth/login')
                 .send(pacienteIngresado)
-            // verificar que retorno el status code correcto
-            expect(response.status).toBe(403)
-            expect(response.body.respuesta).toBeTruthy()
-            expect(response.body.respuesta).toBe(mensajesLogin.forbiddenAccess)
+
+            expect(response.status).toBe(401)
+            expect(response.body.respuesta).toBe(mensajes.unauthorized)
+
+            done()
+        })
+    })
+    describe('Generate new token from refresh  token', () => {
+        it('Should not generate new token if there is not a refresh token', async (done) => {
+            const response = await request.post('/hra/auth/refresh_token')
+
+            expect(response.status).toBe(401)
+            expect(response.body.respuesta).toBe(mensajes.unauthorizedRefresh)
+
+            done()
+        })
+        it('Should not generate new token if the refresh token is invalid', async (done) => {
+            const response = await request.post('/hra/auth/refresh_token')
+                .send({ refresh_token: 'no-token' })
+
+            expect(response.status).toBe(401)
+            expect(response.body.respuesta).toBe(mensajes.unauthorizedRefresh)
+
+            done()
+        })
+        it('Should not generate new token if the refresh token is not on the db', async (done) => {
+            await RefreshToken.deleteMany()
+            const refresh_token = jwt.sign({ refreshTokenKey: 'I am not in the db'}, secreto)
+            const response = await request.post('/hra/auth/refresh_token')
+                .send({ refresh_token })
+
+            expect(response.status).toBe(401)
+            expect(response.body.respuesta).toBe(mensajes.unauthorizedRefresh)
+
+            done()
+        })
+        it('Should not generate new token if the refresh token has been revoked', async (done) => {
+            const refresh_token = jwt.sign({ refreshTokenKey: 'I am revoked' }, secreto)
+            const response = await request.post('/hra/auth/refresh_token')
+                .send({ refresh_token })
+
+            expect(response.status).toBe(401)
+            expect(response.body.respuesta).toBe(mensajes.unauthorizedRefresh)
+
+            done()
+        })
+        it('Should generate new token', async (done) => {
+            const refresh_token = jwt.sign({ refreshTokenKey: 'I am a valid key'}, secreto)
+            const response = await request.post('/hra/auth/refresh_token')
+                .send({ refresh_token })
+
+            expect(response.status).toBe(200)
+            expect(response.body.token).toBeTruthy()
+            expect(response.body.refresh_token).toBeTruthy()
 
             done()
         })
