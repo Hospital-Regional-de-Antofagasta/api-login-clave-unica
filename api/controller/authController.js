@@ -6,6 +6,8 @@ const { mensajes } = require('../config')
 
 const secret = process.env.JWT_SECRET
 
+const secretRefreshToken = process.env.JWT_SECRET_REFRESH_TOKEN
+
 const expiresIn = 60 * 15 * 1 * 1 // seconds, minutes, hours, days
 
 const refreshTokenExpiresIn = 60 * 60 * 24 * 365 // seconds, minutes, hours, days
@@ -21,8 +23,8 @@ exports.login = async (req, res) => {
 
         const token = signToken({
             _id: paciente._id,
-            numeroPaciente: paciente.numeroPaciente
-        }, expiresIn)
+            numeroPaciente: paciente.numeroPaciente,
+        }, expiresIn, secret)
 
         const refreshTokenKey = uuidv4()
 
@@ -30,12 +32,12 @@ exports.login = async (req, res) => {
 
         if (oldRefreshToken) {
             oldRefreshToken.revoked = Date.now()
-            oldRefreshToken.revokedByIp = ipAddress
+.            oldRefreshToken.revokedByIp = ipAddress
             oldRefreshToken.replacedByKey = refreshTokenKey
             await oldRefreshToken.save()
         }
 
-        const refreshToken = signToken({ refreshTokenKey }, refreshTokenExpiresIn)
+        const refreshToken = signToken({ refreshTokenKey }, refreshTokenExpiresIn, secretRefreshToken)
         await saveRefreshToken(refreshTokenKey, paciente, ipAddress)
 
         return res.status(200).send(
@@ -58,7 +60,7 @@ exports.refreshToken = async (req, res) => {
             return res.status(401).send({ respuesta: mensajes.unauthorizedRefresh })
 
         const decoded = await new Promise((resolve, reject) => {
-            jwt.verify(refreshToken, secret, (err, decoded) => {
+            jwt.verify(refreshToken, secretRefreshToken, (err, decoded) => {
                 if (err)
                     return res.status(401).send({ respuesta: mensajes.unauthorizedRefresh })
                 resolve(decoded)
@@ -89,13 +91,13 @@ exports.refreshToken = async (req, res) => {
         oldRefreshToken.replacedByKey = newRefreshTokenKey
         await oldRefreshToken.save()
 
-        const newRefreshToken = signToken({ refreshTokenKey: newRefreshTokenKey }, refreshTokenExpiresIn)
+        const newRefreshToken = signToken({ refreshTokenKey: newRefreshTokenKey }, refreshTokenExpiresIn, secretRefreshToken)
         await saveRefreshToken(newRefreshTokenKey, paciente, ipAddress)
 
         const token = signToken({
             _id: paciente._id,
-            numeroPaciente: paciente.numeroPaciente
-        }, expiresIn)
+            numeroPaciente: paciente.numeroPaciente,
+        }, expiresIn, secretRefreshToken)
 
         return res.status(200).send(
             {
@@ -108,7 +110,7 @@ exports.refreshToken = async (req, res) => {
     }
 }
 
-const signToken = (content, expiresIn) => {
+const signToken = (content, expiresIn, secret) => {
     return jwt.sign(content, secret, { expiresIn: expiresIn })
 }
 
