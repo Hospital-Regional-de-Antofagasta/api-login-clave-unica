@@ -10,14 +10,16 @@ const { mensajes } = require('../config')
 
 const request = supertest(app)
 
-const secreto = process.env.JWT_SECRET
+const secret = process.env.JWT_SECRET
+
+const secretRefreshToken = process.env.JWT_SECRET_REFRESH_TOKEN
 
 beforeEach(async () => {
     await mongoose.disconnect()
     await mongoose.connect(`${process.env.MONGO_URI_TEST}auth_test`, { useNewUrlParser: true, useUnifiedTopology: true })
     await Pacientes.create(pacientesSeed)
     await RefreshToken.create(refreshTokensSeed)
-});
+})
 
 afterEach(async () => {
     await Pacientes.deleteMany()
@@ -89,7 +91,7 @@ describe('Endpoints auth', () => {
         })
         it('Should not generate new token if the refresh token is not on the db', async (done) => {
             await RefreshToken.deleteMany()
-            const refresh_token = jwt.sign({ refreshTokenKey: 'I am not in the db'}, secreto)
+            const refresh_token = jwt.sign({ refreshTokenKey: 'I am not in the db'}, secretRefreshToken)
             const response = await request.post('/hra/auth/refresh_token')
                 .send({ refresh_token })
 
@@ -99,7 +101,7 @@ describe('Endpoints auth', () => {
             done()
         })
         it('Should not generate new token if the refresh token has been revoked', async (done) => {
-            const refresh_token = jwt.sign({ refreshTokenKey: 'I am revoked' }, secreto)
+            const refresh_token = jwt.sign({ refreshTokenKey: 'I am revoked' }, secretRefreshToken)
             const response = await request.post('/hra/auth/refresh_token')
                 .send({ refresh_token })
 
@@ -109,7 +111,7 @@ describe('Endpoints auth', () => {
             done()
         })
         it('Should generate new token', async (done) => {
-            const refresh_token = jwt.sign({ refreshTokenKey: 'I am a valid key'}, secreto)
+            const refresh_token = jwt.sign({ refreshTokenKey: 'I am a valid key'}, secretRefreshToken)
             const response = await request.post('/hra/auth/refresh_token')
                 .send({ refresh_token })
 
