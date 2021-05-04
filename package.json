@@ -1,7 +1,7 @@
 {
   "name": "api-login",
   "version": "1.0.0",
-  "description": "This README would normally document whatever steps are necessary to get your application up and running.",
+  "description": "This README would normally document whatever steps are necessary to get your application up and running. redeploy",
   "main": "index.js",
   "dependencies": {
     "@babel/polyfill": "^7.12.1",
