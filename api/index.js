@@ -17,4 +17,6 @@ app.use('/hra/auth', auth)
 
 app.use('/hra/clave_unica', claveUnica)
 
+app.use('/toapp', claveUnica)
+
 module.exports = app
