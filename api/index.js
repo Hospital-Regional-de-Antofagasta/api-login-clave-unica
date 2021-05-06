@@ -1,22 +1,27 @@
-const express = require('express')
-const mongoose = require('mongoose')
-const cors = require('cors')
-const auth = require('./routes/auth')
-const claveUnica = require('./routes/claveUnica')
-const { loadConfig } = require('./config')
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const auth = require("./routes/auth");
+const claveUnica = require("./routes/claveUnica");
+const { loadConfig } = require("./config");
 
-const app = express()
-app.use(express.json())
-app.use(cors())
+const app = express();
+app.use(express.json());
+app.use(cors());
 
-mongoose.connect(process.env.MONGO_URI, {useNewUrlParser: true, useUnifiedTopology: true })
+console.log("express");
 
-loadConfig()
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
-app.use('/hra/auth', auth)
+console.log("conectado a bd");
 
-app.use('/hra/clave_unica', claveUnica)
+loadConfig();
 
-app.use('/toapp', claveUnica)
+app.use("/hra/auth", auth);
 
-module.exports = app
+app.use("/toapp", claveUnica);
+
+module.exports = app;
