@@ -3,7 +3,6 @@ const { v4: uuidv4 } = require("uuid");
 const Pacientes = require("../models/Pacientes");
 const RefreshToken = require("../models/RefreshToken");
 const { mensajes } = require("../config");
-const utils = require("../utils/utils");
 
 const secretToken = process.env.JWT_SECRET;
 
@@ -31,7 +30,7 @@ exports.login = async (req, res) => {
         respuesta: mensajes.unauthorized,
       });
 
-    const token = utils.signToken(
+    const token = signToken(
       {
         _id: paciente._id,
         numeroPaciente: paciente.numeroPaciente,
@@ -54,7 +53,7 @@ exports.login = async (req, res) => {
       await oldRefreshToken.save();
     }
 
-    const refreshToken = utils.signToken(
+    const refreshToken = signToken(
       { refreshTokenKey },
       refreshTokenExpiresIn,
       secretRefreshToken
@@ -74,8 +73,6 @@ exports.login = async (req, res) => {
 };
 
 exports.refreshToken = async (req, res) => {
-  console.log("generar refresh token");
-
   try {
     const refreshToken = req.body.refresh_token;
     const ipAddress =
@@ -86,7 +83,7 @@ exports.refreshToken = async (req, res) => {
         respuesta: mensajes.unauthorizedRefresh,
       });
 
-    const decodedRefreshToken = await utils.decodeToken(
+    const decodedRefreshToken = await decodeToken(
       refreshToken,
       secretRefreshToken
     );
@@ -96,7 +93,6 @@ exports.refreshToken = async (req, res) => {
         respuesta: mensajes.unauthorizedRefresh,
       });
 
-    console.log("decodedRefreshToken", decodedRefreshToken);
     const { refreshTokenKey } = decodedRefreshToken;
 
     const oldRefreshToken = await RefreshToken.findOne({
@@ -128,7 +124,7 @@ exports.refreshToken = async (req, res) => {
 
     await oldRefreshToken.save();
 
-    const newRefreshToken = utils.signToken(
+    const newRefreshToken = signToken(
       {
         refreshTokenKey: newRefreshTokenKey,
       },
@@ -138,7 +134,7 @@ exports.refreshToken = async (req, res) => {
 
     await saveRefreshToken(newRefreshTokenKey, paciente, ipAddress);
 
-    const token = utils.signToken(
+    const token = signToken(
       {
         _id: paciente._id,
         numeroPaciente: paciente.numeroPaciente,
@@ -169,7 +165,7 @@ const saveRefreshToken = async (key, paciente, ipAddress) => {
   return refreshToken;
 };
 
-const validarpaciente = async (rut) => {
+const validarPaciente = async (rut) => {
   let paciente = await Pacientes.findOne({ rut: rut }).exec();
   if (!paciente) {
     // los ruts tienen un 0 adelante a veces
@@ -177,4 +173,18 @@ const validarpaciente = async (rut) => {
     paciente = await Pacientes.findOne({ rut: rut }).exec();
   }
   return paciente;
+};
+
+const signToken = (content, expiresIn, secret) => {
+  return jwt.sign(content, secret, { expiresIn: expiresIn });
+};
+
+const decodeToken = async (token, secret) => {
+  const result = await new Promise((resolve, reject) => {
+    jwt.verify(token, secret, (err, decoded) => {
+      if (err) return resolve(false);
+      return resolve(decoded);
+    });
+  });
+  return result;
 };

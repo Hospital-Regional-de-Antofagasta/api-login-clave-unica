@@ -4,12 +4,8 @@ const authController = require("../controller/authController");
 
 const router = express.Router();
 
-router.get(
-  "/datos_clave_unica",
-  claveUnicaController.datosCliente,
-  authController.login
-);
+router.get("/datos_clave_unica", claveUnicaController.datosCliente);
 
-router.get("/", claveUnicaController.toapp);
+router.get("/", claveUnicaController.toapp, authController.login);
 
 module.exports = router;

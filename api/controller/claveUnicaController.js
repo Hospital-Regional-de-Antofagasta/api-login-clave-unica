@@ -1,7 +1,6 @@
 const jwt = require("jsonwebtoken");
 const axios = require("axios");
 const { mensajes } = require("../config");
-const utils = require("../utils/utils");
 
 const clientId = process.env.CLIENT_ID;
 const clientSecret = process.env.CLIENT_SECRET;
@@ -13,7 +12,7 @@ const expiresIn = 60 * 15 * 1 * 1; // seconds, minutes, hours, days
 
 exports.datosCliente = async (req, res) => {
   try {
-    const state = utils.signToken(
+    const state = signToken(
       { tokenClaveUnica: "TokenClaveUnica" },
       expiresIn,
       secretClaveUnica
@@ -31,7 +30,7 @@ exports.toapp = async (req, res, next) => {
   try {
     const { code, state } = req.query;
 
-    const decodedStateToken = await utils.decodeToken(state, secretClaveUnica);
+    const decodedStateToken = await decodeToken(state, secretClaveUnica);
 
     if (!decodedStateToken) return res.status(401).send(err);
 
@@ -52,7 +51,6 @@ exports.toapp = async (req, res, next) => {
 
     next();
 
-    // res.status(200).send(infoUsuario)
   } catch (error) {
     res.status(500).send("error");
   }
@@ -73,8 +71,7 @@ const requestTokenClaveUnica = async (code, state) => {
   params.append("state", state);
 
   const response = await axios.post(
-    "https://accounts.claveunica.gob.cl/\
-        openid/token/",
+    "https://accounts.claveunica.gob.cl/openid/token/",
     params,
     config
   );
@@ -89,13 +86,24 @@ const requestInfoUsuarioClaveUnica = async (access_token) => {
   };
 
   const response = await axios.post(
-    "https://accounts.claveunica.gob.cl/\
-        openid/userinfo",
+    "https://accounts.claveunica.gob.cl/openid/userinfo",
     {},
     config
   );
 
-  // const { access_token } = response.data
-
   return response.data;
+};
+
+const signToken = (content, expiresIn, secret) => {
+  return jwt.sign(content, secret, { expiresIn: expiresIn });
+};
+
+const decodeToken = async (token, secret) => {
+  const result = await new Promise((resolve, reject) => {
+    jwt.verify(token, secret, (err, decoded) => {
+      if (err) return resolve(false);
+      return resolve(decoded);
+    });
+  });
+  return result;
 };
