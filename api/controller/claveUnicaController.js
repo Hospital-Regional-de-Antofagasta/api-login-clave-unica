@@ -32,7 +32,8 @@ exports.toapp = async (req, res, next) => {
 
     const decodedStateToken = await decodeToken(state, secretClaveUnica);
 
-    if (!decodedStateToken) return res.status(401).send(err);
+    if (!decodedStateToken)
+      return res.status(401).send({ respuesta: mensajes.unauthorized });
 
     const { access_token } = await requestTokenClaveUnica(code, state);
 
@@ -50,9 +51,8 @@ exports.toapp = async (req, res, next) => {
     };
 
     next();
-
   } catch (error) {
-    res.status(500).send("error");
+    res.status(500).send({ respuesta: mensajes.serverError });
   }
 };
 
@@ -95,7 +95,7 @@ const requestInfoUsuarioClaveUnica = async (access_token) => {
 };
 
 const signToken = (content, expiresIn, secret) => {
-  return jwt.sign(content, secret, { expiresIn: expiresIn });
+  return jwt.sign(content, secret, { expiresIn });
 };
 
 const decodeToken = async (token, secret) => {

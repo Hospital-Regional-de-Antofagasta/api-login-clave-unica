@@ -21,8 +21,6 @@ exports.login = async (req, res) => {
     const ipAddress =
       req.headers["x-forwarded-for"] || req.connection.remoteAddress;
 
-    console.log("ipAddress", ipAddress);
-
     const paciente = await validarPaciente(rut);
 
     if (!paciente)
@@ -68,6 +66,7 @@ exports.login = async (req, res) => {
       nombre_completo: nombreCompleto,
     });
   } catch (error) {
+    console.log(error)
     res.status(500).send({ respuesta: mensajes.serverError });
   }
 };

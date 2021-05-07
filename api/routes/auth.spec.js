@@ -43,37 +43,6 @@ const pacienteIngresado = {
 };
 
 describe("Endpoints auth", () => {
-  // describe('Generate token for user', () => {
-  //     it('Should not generate token for paciente that does not exist', async (done) => {
-  //         const response = await request.post('/hra/auth/login')
-  //             .send(pacienteNoIngresado)
-
-  //         expect(response.status).toBe(401)
-  //         expect(response.body.respuesta).toBe(mensajes.unauthorized)
-
-  //         done()
-  //     })
-  //     it('Should generate token for paciente that exists', async (done) => {
-  //         const response = await request.post('/hra/auth/login')
-  //             .send(pacienteIngresado)
-
-  //         expect(response.status).toBe(200)
-  //         expect(response.body.token).toBeTruthy()
-  //         expect(response.body.refresh_token).toBeTruthy()
-
-  //         done()
-  //     })
-  //     it('Should not generate token with empty db', async (done) => {
-  //         await Pacientes.deleteMany()
-  //         const response = await request.post('/hra/auth/login')
-  //             .send(pacienteIngresado)
-
-  //         expect(response.status).toBe(401)
-  //         expect(response.body.respuesta).toBe(mensajes.unauthorized)
-
-  //         done()
-  //     })
-  // })
   describe("Generate new token from refresh  token", () => {
     it("Should not generate new token if there is not a refresh token", async (done) => {
       const response = await request.post("/hra/auth/refresh_token");
