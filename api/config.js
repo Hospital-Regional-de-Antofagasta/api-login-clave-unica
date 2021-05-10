@@ -9,8 +9,10 @@ let mensajes = {
 const loadConfig = async () => {
   try {
     const config = await ConfigApiLogin.findOne().exec();
-    mensajes = config.mensajes;
-  } catch (error) {}
+    if (config) mensajes = config.mensajes;
+  } catch (error) {
+    console.log(error)
+  }
 };
 
 module.exports = {

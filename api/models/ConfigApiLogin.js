@@ -10,7 +10,7 @@ const ConfigApiLogin = mongoose.model(
       serverError: String,
     },
   }),
-  { collection: "config_api_login" }
+  "config_api_login"
 );
 
 module.exports = ConfigApiLogin;

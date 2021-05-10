@@ -66,7 +66,6 @@ exports.login = async (req, res) => {
       nombre_completo: nombreCompleto,
     });
   } catch (error) {
-    console.log(error)
     res.status(500).send({ respuesta: mensajes.serverError });
   }
 };
