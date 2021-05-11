@@ -10,9 +10,7 @@ const loadConfig = async () => {
   try {
     const config = await ConfigApiLogin.findOne().exec();
     if (config) mensajes = config.mensajes;
-  } catch (error) {
-    console.log(error)
-  }
+  } catch (error) {}
 };
 
 module.exports = {

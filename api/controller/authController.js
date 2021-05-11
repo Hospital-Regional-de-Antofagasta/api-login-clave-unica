@@ -148,7 +148,6 @@ exports.refreshToken = async (req, res) => {
       refresh_token: newRefreshToken,
     });
   } catch (error) {
-    console.log("error", error);
     res.status(500).send({ respuesta: mensajes.serverError });
   }
 };
