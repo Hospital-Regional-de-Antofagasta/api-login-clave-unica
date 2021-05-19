@@ -45,7 +45,7 @@ const pacienteIngresado = {
 describe("Endpoints auth", () => {
   describe("Generate new token from refresh  token", () => {
     it("Should not generate new token if there is not a refresh token", async (done) => {
-      const response = await request.post("/hra/auth/refresh_token");
+      const response = await request.post("/v1/auth/refresh_token");
 
       expect(response.status).toBe(401);
       expect(response.body.respuesta).toBe(mensajes.unauthorizedRefresh);
@@ -54,7 +54,7 @@ describe("Endpoints auth", () => {
     });
     it("Should not generate new token if the refresh token is invalid", async (done) => {
       const response = await request
-        .post("/hra/auth/refresh_token")
+        .post("/v1/auth/refresh_token")
         .send({ refresh_token: "no-token" });
       expect(response.status).toBe(401);
       expect(response.body.respuesta).toBe(mensajes.unauthorizedRefresh);
@@ -68,7 +68,7 @@ describe("Endpoints auth", () => {
         secretRefreshToken
       );
       const response = await request
-        .post("/hra/auth/refresh_token")
+        .post("/v1/auth/refresh_token")
         .send({ refresh_token });
 
       expect(response.status).toBe(401);
@@ -82,7 +82,7 @@ describe("Endpoints auth", () => {
         secretRefreshToken
       );
       const response = await request
-        .post("/hra/auth/refresh_token")
+        .post("/v1/auth/refresh_token")
         .send({ refresh_token });
 
       expect(response.status).toBe(401);
@@ -96,7 +96,7 @@ describe("Endpoints auth", () => {
         secretRefreshToken
       );
       const response = await request
-        .post("/hra/auth/refresh_token")
+        .post("/v1/auth/refresh_token")
         .send({ refresh_token });
 
       expect(response.status).toBe(200);

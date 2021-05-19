@@ -8,6 +8,7 @@ const ConfigApiLogin = mongoose.model(
       unauthorized: String,
       unauthorizedRefresh: String,
       serverError: String,
+      version: Number,
     },
   }),
   "config_api_login"

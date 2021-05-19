@@ -8,7 +8,7 @@ let mensajes = {
 
 const loadConfig = async () => {
   try {
-    const config = await ConfigApiLogin.findOne().exec();
+    const config = await ConfigApiLogin.findOne({ version: 1 }).exec();
     if (config) mensajes = config.mensajes;
   } catch (error) {}
 };
