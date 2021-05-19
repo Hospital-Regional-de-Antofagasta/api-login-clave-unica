@@ -16,7 +16,7 @@ mongoose.connect(process.env.MONGO_URI, {
 
 loadConfig();
 
-app.use("/hra/auth", auth);
+app.use("/v1/auth", auth);
 
 app.use("/toapp", claveUnica);
 

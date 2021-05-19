@@ -1,7 +1,9 @@
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
-const Paciente = mongoose.model('paciente', new Schema ({
+const Paciente = mongoose.model(
+  "paciente",
+  new Schema({
     numeroPaciente: Number,
     rut: String,
     apellidoPaterno: String,
@@ -18,6 +20,7 @@ const Paciente = mongoose.model('paciente', new Schema ({
     telefonoMovil: String,
     correoCuerpo: String,
     correoExtension: String,
-}))
+  })
+);
 
-module.exports = Paciente
+module.exports = Paciente;
