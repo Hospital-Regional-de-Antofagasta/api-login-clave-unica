@@ -14,6 +14,63 @@ const expiresIn = 60 * 15 * 1 * 1;
 // seconds, minutes, hours, days
 const refreshTokenExpiresIn = 60 * 60 * 24 * 365;
 
+exports.loginTest = async (req, res) => {
+  try {
+    const nombreCompleto = "testing";
+    const rut = "88888888-8"
+
+    const ipAddress =
+      req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+
+    const paciente = await validarPaciente(rut);
+
+    if (!paciente)
+      return res.status(401).send({
+        respuesta: mensajes.unauthorized,
+      });
+
+    const token = signToken(
+      {
+        _id: paciente._id,
+        numeroPaciente: paciente.numeroPaciente,
+      },
+      expiresIn,
+      secretToken
+    );
+
+    const refreshTokenKey = uuidv4();
+
+    const oldRefreshToken = await RefreshToken.findOne({
+      paciente: paciente._id,
+      revoked: null,
+    }).exec();
+
+    if (oldRefreshToken) {
+      oldRefreshToken.revoked = Date.now();
+      oldRefreshToken.revokedByIp = ipAddress;
+      oldRefreshToken.replacedByKey = refreshTokenKey;
+      await oldRefreshToken.save();
+    }
+
+    const refreshToken = signToken(
+      { refreshTokenKey },
+      refreshTokenExpiresIn,
+      secretRefreshToken
+    );
+    await saveRefreshToken(refreshTokenKey, paciente, ipAddress);
+
+    // si se hace la version web falta el httpOnly cookie en el refresh
+    // token
+    res.status(200).send({
+      token: token,
+      refresh_token: refreshToken,
+      nombre_completo: nombreCompleto,
+    });
+  } catch (error) {
+    res.status(500).send({ respuesta: mensajes.serverError, errorName: error.name, errorMessage: error.message });
+  }
+};
+
 exports.login = async (req, res) => {
   try {
     const { nombreCompleto, rut } = req.body;
@@ -66,7 +123,7 @@ exports.login = async (req, res) => {
       nombre_completo: nombreCompleto,
     });
   } catch (error) {
-    res.status(500).send({ respuesta: mensajes.serverError });
+    res.status(500).send({ respuesta: mensajes.serverError, errorName: error.name, errorMessage: error.message });
   }
 };
 
