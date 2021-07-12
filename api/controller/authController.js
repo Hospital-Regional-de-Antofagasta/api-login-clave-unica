@@ -17,7 +17,7 @@ const refreshTokenExpiresIn = 60 * 60 * 24 * 365;
 exports.loginTest = async (req, res) => {
   try {
     const nombreCompleto = "testing";
-    const rut = "88888888-8"
+    const rut = "88888888-8";
 
     const ipAddress =
       req.headers["x-forwarded-for"] || req.connection.remoteAddress;
@@ -164,7 +164,9 @@ exports.refreshToken = async (req, res) => {
     const paciente = await Pacientes.findById(paciente_id).exec();
 
     if (!paciente)
-      return res.status(401).send({ respuesta: await getMensajes("unauthorized") });
+      return res
+        .status(401)
+        .send({ respuesta: await getMensajes("unauthorized") });
 
     if (oldRefreshToken.revoked)
       return res.status(401).send({

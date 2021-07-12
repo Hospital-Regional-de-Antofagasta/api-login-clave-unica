@@ -25,7 +25,8 @@ exports.getMensajes = async (tipo) => {
   try {
     const { mensajes } = await ConfigApiLogin.findOne({ version: 1 }).exec();
     if (mensajes) {
-      return mensajes[tipo]};
+      return mensajes[tipo];
+    }
     return mensajesPorDefecto[tipo];
   } catch (error) {}
 };

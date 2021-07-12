@@ -33,7 +33,9 @@ exports.toapp = async (req, res, next) => {
     const decodedStateToken = await decodeToken(state, secretClaveUnica);
 
     if (!decodedStateToken)
-      return res.status(401).send({ respuesta: await getMensajes("unauthorized") });
+      return res
+        .status(401)
+        .send({ respuesta: await getMensajes("unauthorized") });
 
     const { access_token } = await requestTokenClaveUnica(code, state);
 

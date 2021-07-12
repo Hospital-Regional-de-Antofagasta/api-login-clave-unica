@@ -80,7 +80,7 @@ describe("Endpoints auth", () => {
         .post("/v1/auth/refresh_token")
         .send({ refresh_token });
 
-        const mensaje = await getMensajes("unauthorizedRefresh");
+      const mensaje = await getMensajes("unauthorizedRefresh");
 
       expect(response.status).toBe(401);
       expect(response.body).toEqual({
@@ -103,8 +103,7 @@ describe("Endpoints auth", () => {
         .post("/v1/auth/refresh_token")
         .send({ refresh_token });
 
-        const mensaje = await getMensajes("unauthorizedRefresh");
-
+      const mensaje = await getMensajes("unauthorizedRefresh");
 
       expect(response.status).toBe(401);
       expect(response.body).toEqual({
