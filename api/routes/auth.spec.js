@@ -6,11 +6,11 @@ const Pacientes = require("../models/Pacientes");
 const RefreshToken = require("../models/RefreshToken");
 const pacientesSeed = require("../testSeeds/pacientesSeed.json");
 const refreshTokensSeed = require("../testSeeds/refreshTokensSeed.json");
-const { mensajes } = require("../config");
+const { getMensajes } = require("../config");
+const ConfigApiLogin = require("../models/ConfigApiLogin");
+const configSeed = require("../testSeeds/configSeed.json");
 
 const request = supertest(app);
-
-const secret = process.env.JWT_SECRET;
 
 const secretRefreshToken = process.env.JWT_SECRET_REFRESH_TOKEN;
 
@@ -22,33 +22,32 @@ beforeEach(async () => {
   });
   await Pacientes.create(pacientesSeed);
   await RefreshToken.create(refreshTokensSeed);
+  await ConfigApiLogin.create(configSeed);
 });
 
 afterEach(async () => {
   await Pacientes.deleteMany();
   await RefreshToken.deleteMany();
+  await ConfigApiLogin.deleteMany();
   await mongoose.connection.close();
 });
-
-const pacienteNoIngresado = {
-  nombre: "nombre",
-  rut: "1-1",
-  token_clave_unica: "1234",
-};
-
-const pacienteIngresado = {
-  nombre: "nombre",
-  rut: "10771131-7",
-  token_clave_unica: "1234",
-};
 
 describe("Endpoints auth", () => {
   describe("Generate new token from refresh  token", () => {
     it("Should not generate new token if there is not a refresh token", async (done) => {
       const response = await request.post("/v1/auth/refresh_token");
 
+      const mensaje = await getMensajes("unauthorizedRefresh");
+
       expect(response.status).toBe(401);
-      expect(response.body.respuesta).toBe(mensajes.unauthorizedRefresh);
+      expect(response.body).toEqual({
+        respuesta: {
+          titulo: mensaje.titulo,
+          mensaje: mensaje.mensaje,
+          color: mensaje.color,
+          icono: mensaje.icono,
+        },
+      });
 
       done();
     });
@@ -56,8 +55,18 @@ describe("Endpoints auth", () => {
       const response = await request
         .post("/v1/auth/refresh_token")
         .send({ refresh_token: "no-token" });
+
+      const mensaje = await getMensajes("unauthorizedRefresh");
+
       expect(response.status).toBe(401);
-      expect(response.body.respuesta).toBe(mensajes.unauthorizedRefresh);
+      expect(response.body).toEqual({
+        respuesta: {
+          titulo: mensaje.titulo,
+          mensaje: mensaje.mensaje,
+          color: mensaje.color,
+          icono: mensaje.icono,
+        },
+      });
 
       done();
     });
@@ -71,8 +80,17 @@ describe("Endpoints auth", () => {
         .post("/v1/auth/refresh_token")
         .send({ refresh_token });
 
+        const mensaje = await getMensajes("unauthorizedRefresh");
+
       expect(response.status).toBe(401);
-      expect(response.body.respuesta).toBe(mensajes.unauthorizedRefresh);
+      expect(response.body).toEqual({
+        respuesta: {
+          titulo: mensaje.titulo,
+          mensaje: mensaje.mensaje,
+          color: mensaje.color,
+          icono: mensaje.icono,
+        },
+      });
 
       done();
     });
@@ -85,8 +103,18 @@ describe("Endpoints auth", () => {
         .post("/v1/auth/refresh_token")
         .send({ refresh_token });
 
+        const mensaje = await getMensajes("unauthorizedRefresh");
+
+
       expect(response.status).toBe(401);
-      expect(response.body.respuesta).toBe(mensajes.unauthorizedRefresh);
+      expect(response.body).toEqual({
+        respuesta: {
+          titulo: mensaje.titulo,
+          mensaje: mensaje.mensaje,
+          color: mensaje.color,
+          icono: mensaje.icono,
+        },
+      });
 
       done();
     });

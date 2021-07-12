@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const axios = require("axios");
-const { mensajes } = require("../config");
+const { getMensajes } = require("../config");
 
 const clientId = process.env.CLIENT_ID;
 const clientSecret = process.env.CLIENT_SECRET;
@@ -22,7 +22,7 @@ exports.datosCliente = async (req, res) => {
       state,
     });
   } catch (error) {
-    res.status(500).send({ respuesta: mensajes.serverError });
+    res.status(500).send({ respuesta: await getMensajes("serverError") });
   }
 };
 
@@ -33,7 +33,7 @@ exports.toapp = async (req, res, next) => {
     const decodedStateToken = await decodeToken(state, secretClaveUnica);
 
     if (!decodedStateToken)
-      return res.status(401).send({ respuesta: mensajes.unauthorized });
+      return res.status(401).send({ respuesta: await getMensajes("unauthorized") });
 
     const { access_token } = await requestTokenClaveUnica(code, state);
 
@@ -52,7 +52,7 @@ exports.toapp = async (req, res, next) => {
 
     next();
   } catch (error) {
-    res.status(500).send({ respuesta: mensajes.serverError });
+    res.status(500).send({ respuesta: await getMensajes("serverError") });
   }
 };
 

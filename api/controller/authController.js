@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid");
 const Pacientes = require("../models/Pacientes");
 const RefreshToken = require("../models/RefreshToken");
-const { mensajes } = require("../config");
+const { getMensajes } = require("../config");
 
 const secretToken = process.env.JWT_SECRET;
 
@@ -26,7 +26,7 @@ exports.loginTest = async (req, res) => {
 
     if (!paciente)
       return res.status(401).send({
-        respuesta: mensajes.unauthorized,
+        respuesta: await getMensajes("unauthorized"),
       });
 
     const token = signToken(
@@ -67,7 +67,7 @@ exports.loginTest = async (req, res) => {
       nombre_completo: nombreCompleto,
     });
   } catch (error) {
-    res.status(500).send({ respuesta: mensajes.serverError, errorName: error.name, errorMessage: error.message });
+    res.status(500).send({ respuesta: await getMensajes("serverError") });
   }
 };
 
@@ -82,7 +82,7 @@ exports.login = async (req, res) => {
 
     if (!paciente)
       return res.status(401).send({
-        respuesta: mensajes.unauthorized,
+        respuesta: await getMensajes("unauthorized"),
       });
 
     const token = signToken(
@@ -123,7 +123,7 @@ exports.login = async (req, res) => {
       nombre_completo: nombreCompleto,
     });
   } catch (error) {
-    res.status(500).send({ respuesta: mensajes.serverError, errorName: error.name, errorMessage: error.message });
+    res.status(500).send({ respuesta: await getMensajes("serverError") });
   }
 };
 
@@ -135,7 +135,7 @@ exports.refreshToken = async (req, res) => {
 
     if (!refreshToken)
       return res.status(401).send({
-        respuesta: mensajes.unauthorizedRefresh,
+        respuesta: await getMensajes("unauthorizedRefresh"),
       });
 
     const decodedRefreshToken = await decodeToken(
@@ -145,7 +145,7 @@ exports.refreshToken = async (req, res) => {
 
     if (!decodedRefreshToken)
       return res.status(401).send({
-        respuesta: mensajes.unauthorizedRefresh,
+        respuesta: await getMensajes("unauthorizedRefresh"),
       });
 
     const { refreshTokenKey } = decodedRefreshToken;
@@ -156,7 +156,7 @@ exports.refreshToken = async (req, res) => {
 
     if (!oldRefreshToken)
       return res.status(401).send({
-        respuesta: mensajes.unauthorizedRefresh,
+        respuesta: await getMensajes("unauthorizedRefresh"),
       });
 
     const { paciente_id } = oldRefreshToken;
@@ -164,11 +164,11 @@ exports.refreshToken = async (req, res) => {
     const paciente = await Pacientes.findById(paciente_id).exec();
 
     if (!paciente)
-      return res.status(401).send({ respuesta: mensajes.unauthorized });
+      return res.status(401).send({ respuesta: await getMensajes("unauthorized") });
 
     if (oldRefreshToken.revoked)
       return res.status(401).send({
-        respuesta: mensajes.unauthorizedRefresh,
+        respuesta: await getMensajes("unauthorizedRefresh"),
       });
 
     const newRefreshTokenKey = uuidv4();
@@ -205,7 +205,7 @@ exports.refreshToken = async (req, res) => {
       refresh_token: newRefreshToken,
     });
   } catch (error) {
-    res.status(500).send({ respuesta: mensajes.serverError });
+    res.status(500).send({ respuesta: await getMensajes("serverError") });
   }
 };
 

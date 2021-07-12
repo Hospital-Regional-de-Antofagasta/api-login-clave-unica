@@ -1,19 +1,31 @@
 const ConfigApiLogin = require("./models/ConfigApiLogin");
 
-let mensajes = {
-  unauthorized: "No se encuentra en los registros del hospital.",
-  unauthorizedRefresh: "Su sesión ha expirado.",
-  serverError: "Se produjo un error.",
+const mensajesPorDefecto = {
+  unauthorized: {
+    titulo: "Alerta",
+    mensaje: "No se encuentra en los registros del hospital.",
+    color: "",
+    icono: "",
+  },
+  unauthorizedRefresh: {
+    titulo: "Alerta",
+    mensaje: "Su sesión ha expirado.",
+    color: "",
+    icono: "",
+  },
+  serverError: {
+    titulo: "Alerta",
+    mensaje: "Ocurrió un error inesperado.",
+    color: "",
+    icono: "",
+  },
 };
 
-const loadConfig = async () => {
+exports.getMensajes = async (tipo) => {
   try {
-    const config = await ConfigApiLogin.findOne({ version: 1 }).exec();
-    if (config) mensajes = config.mensajes;
+    const { mensajes } = await ConfigApiLogin.findOne({ version: 1 }).exec();
+    if (mensajes) {
+      return mensajes[tipo]};
+    return mensajesPorDefecto[tipo];
   } catch (error) {}
-};
-
-module.exports = {
-  loadConfig,
-  mensajes,
 };
