@@ -24,7 +24,7 @@ afterEach(async () => {
 describe("Endpoints clave unica", () => {
   describe("Generate state token and return client_id", () => {
     it("Should generate state token and return client_id", async (done) => {
-      const response = await request.get("/toapp/datos_clave_unica");
+      const response = await request.get("/toapp/datos-clave-unica");
 
       expect(response.status).toBe(200);
       expect(response.body.clientId).toBeTruthy();
