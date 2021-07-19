@@ -1,20 +1,30 @@
 const supertest = require("supertest");
 const app = require("../index");
-const jwt = require("jsonwebtoken");
-const { mensajes } = require("../config");
+const mongoose = require("mongoose");
+const { getMensajes } = require("../config");
+const ConfigApiLogin = require("../models/ConfigApiLogin");
+const configSeed = require("../testSeeds/configSeed.json");
 
 const request = supertest(app);
 
-const clientId = process.env.CLIENT_ID;
+beforeEach(async () => {
+  await mongoose.disconnect();
+  await mongoose.connect(`${process.env.MONGO_URI_TEST}clave_unica_test`, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+  await ConfigApiLogin.create(configSeed);
+});
 
-const secretClaveUnica = process.env.JWT_SECRET_CLAVE_UNICA;
-
-const expiresIn = 60 * 15 * 1 * 1; // seconds, minutes, hours, days
+afterEach(async () => {
+  await ConfigApiLogin.deleteMany();
+  await mongoose.connection.close();
+});
 
 describe("Endpoints clave unica", () => {
   describe("Generate state token and return client_id", () => {
     it("Should generate state token and return client_id", async (done) => {
-      const response = await request.get("/toapp/datos_clave_unica");
+      const response = await request.get("/toapp/datos-clave-unica");
 
       expect(response.status).toBe(200);
       expect(response.body.clientId).toBeTruthy();
@@ -29,8 +39,17 @@ describe("Endpoints clave unica", () => {
         "/toapp?code=c40a748e828843d48b8ae52dd9d3b238&state=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbkNsYXZlVW5pY2EiOiJUb2tlbkNsYXZlVW5pY2EiLCJpYXQiOjE2MjAzOTk1NTEsImV4cCI6MTYyMDQwMDQ1MX0.o0-L5efmYHmefEIgT9LJJ-YWuWRYBL_Egve4u3myxm8"
       );
 
+      const mensaje = await getMensajes("unauthorized");
+
       expect(response.status).toBe(401);
-      expect(response.body.respuesta).toBe(mensajes.unauthorized);
+      expect(response.body).toEqual({
+        respuesta: {
+          titulo: mensaje.titulo,
+          mensaje: mensaje.mensaje,
+          color: mensaje.color,
+          icono: mensaje.icono,
+        },
+      });
 
       done();
     });

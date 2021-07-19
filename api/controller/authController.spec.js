@@ -2,21 +2,23 @@ const mongoose = require("mongoose");
 const authController = require("./authController");
 const Pacientes = require("../models/Pacientes");
 const pacientesSeed = require("../testSeeds/pacientesSeed.json");
-const { mensajes } = require("../config");
-
-const secret = process.env.JWT_SECRET;
+const { getMensajes } = require("../config");
+const ConfigApiLogin = require("../models/ConfigApiLogin");
+const configSeed = require("../testSeeds/configSeed.json");
 
 beforeEach(async () => {
   await mongoose.disconnect();
-  await mongoose.connect(`${process.env.MONGO_URI_TEST}auth_test`, {
+  await mongoose.connect(`${process.env.MONGO_URI_TEST}auth_controller_test`, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
   await Pacientes.create(pacientesSeed);
+  await ConfigApiLogin.create(configSeed);
 });
 
 afterEach(async () => {
   await Pacientes.deleteMany();
+  await ConfigApiLogin.deleteMany();
   await mongoose.connection.close();
 });
 
@@ -48,7 +50,7 @@ describe("Function login", () => {
       expect(res.status.mock.calls).toEqual([[401]]);
 
       expect(res.send.mock.calls).toEqual([
-        [{ respuesta: mensajes.unauthorized }],
+        [{ respuesta: await getMensajes("unauthorized") }],
       ]);
 
       done();
@@ -90,7 +92,7 @@ describe("Function login", () => {
       expect(res.status.mock.calls).toEqual([[401]]);
 
       expect(res.send.mock.calls).toEqual([
-        [{ respuesta: mensajes.unauthorized }],
+        [{ respuesta: await getMensajes("unauthorized") }],
       ]);
 
       done();
