@@ -1,5 +1,5 @@
 const supertest = require("supertest");
-const app = require("../index");
+const app = require("../app");
 const mongoose = require("mongoose");
 const { getMensajes } = require("../config");
 const ConfigApiLogin = require("../models/ConfigApiLogin");
