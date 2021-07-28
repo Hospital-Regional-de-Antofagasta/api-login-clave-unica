@@ -4,7 +4,13 @@ const Schema = mongoose.Schema;
 const Paciente = mongoose.model(
   "paciente",
   new Schema({
-    numeroPaciente: Number,
+    numerosPaciente: [
+      {
+        numero: Number,
+        codigoEstablecimiento: String,
+        nombreEstablecimiento: String,
+      }
+    ],
     rut: String,
     apellidoPaterno: String,
     apellidoMaterno: String,
@@ -20,6 +26,9 @@ const Paciente = mongoose.model(
     telefonoMovil: String,
     correoCuerpo: String,
     correoExtension: String,
+    datosContactoActualizados: { type: Boolean, default: false },
+    fechaFallecimiento: { type: Date, select: false},
+    nombreSocial: String,
   })
 );
 
