@@ -67,6 +67,7 @@ exports.loginTest = async (req, res) => {
       nombre_completo: nombreCompleto,
     });
   } catch (error) {
+    if (process.env.JWT_SECRET === "dev") return res.status(500).send({ respuesta: await getMensajes("serverError"), error });
     res.status(500).send({ respuesta: await getMensajes("serverError") });
   }
 };
@@ -123,7 +124,7 @@ exports.login = async (req, res) => {
       nombre_completo: nombreCompleto,
     });
   } catch (error) {
-    console.log(error)
+    if (process.env.JWT_SECRET === "dev") return res.status(500).send({ respuesta: await getMensajes("serverError"), error });
     res.status(500).send({ respuesta: await getMensajes("serverError") });
   }
 };
@@ -208,6 +209,7 @@ exports.refreshToken = async (req, res) => {
       refresh_token: newRefreshToken,
     });
   } catch (error) {
+    if (process.env.JWT_SECRET === "dev") return res.status(500).send({ respuesta: await getMensajes("serverError"), error });
     res.status(500).send({ respuesta: await getMensajes("serverError") });
   }
 };
