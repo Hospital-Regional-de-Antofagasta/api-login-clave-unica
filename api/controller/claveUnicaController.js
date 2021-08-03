@@ -22,7 +22,14 @@ exports.datosCliente = async (req, res) => {
       state,
     });
   } catch (error) {
-    if (process.env.JWT_SECRET === "dev") return res.status(500).send({ respuesta: await getMensajes("serverError"), error });
+    if (process.env.NODE_ENV === "dev")
+      return res.status(500).send({
+        respuesta: await getMensajes("serverError"),
+        detalles_error: {
+          nombre: error.name,
+          mensaje: error.message,
+        },
+      });
     res.status(500).send({ respuesta: await getMensajes("serverError") });
   }
 };
@@ -55,7 +62,14 @@ exports.toapp = async (req, res, next) => {
 
     next();
   } catch (error) {
-    if (process.env.JWT_SECRET === "dev") return res.status(500).send({ respuesta: await getMensajes("serverError"), error });
+    if (process.env.NODE_ENV === "dev")
+      return res.status(500).send({
+        respuesta: await getMensajes("serverError"),
+        detalles_error: {
+          nombre: error.name,
+          mensaje: error.message,
+        },
+      });
     res.status(500).send({ respuesta: await getMensajes("serverError") });
   }
 };
