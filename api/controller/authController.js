@@ -16,8 +16,9 @@ const refreshTokenExpiresIn = 60 * 60 * 24 * 365;
 
 exports.loginTest = async (req, res) => {
   try {
-    const nombreCompleto = "testing";
-    const rut = "88888888-8";
+    const nombreCompleto = req.query.nombreCompleto ? req.query.nombreCompleto : "testing";
+    const rut = req.query.rut ? req.query.rut : "88888888-8";
+    const expiresInTesting = req.query.tiempoToken ? req.query.tiempoToken : expiresIn;
 
     const ipAddress =
       req.headers["x-forwarded-for"] || req.connection.remoteAddress;
@@ -34,7 +35,7 @@ exports.loginTest = async (req, res) => {
         _id: paciente._id,
         numerosPaciente: paciente.numerosPaciente,
       },
-      expiresIn,
+      expiresInTesting,
       secretToken
     );
 
