@@ -6,6 +6,6 @@ const router = express.Router();
 
 router.get("/datos-clave-unica", claveUnicaController.datosCliente);
 
-router.get("/", claveUnicaController.toapp, authController.login);
+router.get("", claveUnicaController.toapp, authController.login);
 
 module.exports = router;
