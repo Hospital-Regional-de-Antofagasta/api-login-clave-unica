@@ -1,10 +1,15 @@
 const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
 const authController = require("./authController");
 const Pacientes = require("../models/Pacientes");
 const pacientesSeed = require("../testSeeds/pacientesSeed.json");
 const { getMensajes } = require("../config");
 const ConfigApiLogin = require("../models/ConfigApiLogin");
 const configSeed = require("../testSeeds/configSeed.json");
+
+const secretToken = process.env.JWT_SECRET;
+
+const secretRefreshToken = process.env.JWT_SECRET_REFRESH_TOKEN;
 
 beforeEach(async () => {
   await mongoose.disconnect();
@@ -72,6 +77,28 @@ describe("Function login", () => {
 
       expect(res.send.mock.calls[0][0].token).toBeTruthy();
       expect(res.send.mock.calls[0][0].refresh_token).toBeTruthy();
+
+      const token = res.send.mock.calls[0][0].token;
+
+      const resultToken = await new Promise((resolve, reject) => {
+        jwt.verify(token, secretToken, (err, decoded) => {
+          if (err) return resolve(false);
+          return resolve(decoded);
+        });
+      });
+
+      expect(resultToken.numeroPaciente).toBe(16)
+
+      const refreshToken = res.send.mock.calls[0][0].refresh_token;
+
+      const resultRefreshToken = await new Promise((resolve, reject) => {
+        jwt.verify(refreshToken, secretRefreshToken, (err, decoded) => {
+          if (err) return resolve(false);
+          return resolve(decoded);
+        });
+      });
+
+      expect(resultRefreshToken.refreshTokenKey).toBeTruthy()
 
       done();
     });
