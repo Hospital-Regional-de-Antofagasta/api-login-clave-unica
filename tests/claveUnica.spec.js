@@ -1,9 +1,9 @@
 const supertest = require("supertest");
-const app = require("../app");
+const app = require("../api/app");
 const mongoose = require("mongoose");
-const { getMensajes } = require("../config");
-const ConfigApiLogin = require("../models/ConfigApiLogin");
-const configSeed = require("../testSeeds/configSeed.json");
+const { getMensajes } = require("../api/config");
+const ConfigApiLogin = require("../api/models/ConfigApiLogin");
+const configSeed = require("./testSeeds/configSeed.json");
 
 const request = supertest(app);
 

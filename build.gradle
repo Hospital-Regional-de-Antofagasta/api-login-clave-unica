@@ -1,0 +1,101 @@
+plugins{
+    id "base"
+    id "nl.eleven.node-gradle.node" version "1.0.0"
+    id "com.palantir.docker" version "0.28.0"
+    id "com.palantir.docker-run" version "0.28.0"
+}
+
+var nodeVersion = "16.8.0"
+var tag = "1.0.0-SNAPSHOT"
+
+node {
+    download true
+    version nodeVersion
+}
+
+
+docker {
+    name "$project.name:$tag"
+    files fileTree("$project.buildDir/node")
+}
+
+dockerRun {
+    name  "mongo"
+    image "mongo:5.0"
+    ports  "27017:27017"
+    daemonize true
+    ignoreExitValue true
+}
+
+String testsExecutedMarkerName = "${projectDir}/.tests.executed"
+String runningMongo = "${projectDir}/.tests.mongo"
+
+tasks.named("dockerRemoveContainer"){t-> t.dependsOn(dockerStop)}
+
+tasks.named("dockerRun"){t->
+    {
+        t.doLast {
+            new File(runningMongo).text = "Running mongo"
+        }
+        t.outputs.file runningMongo
+    }
+}
+
+task startMongo {
+    dependsOn "dockerRun"
+    outputs.file runningMongo
+}
+
+task stopMongo {
+    dependsOn dockerRemoveContainer
+
+    doLast {
+        delete runningMongo
+    }
+}
+
+task test(type: NpmTask) {
+    dependsOn npmInstall, startMongo
+    environment CI: 'true'
+
+    args = ['run', 'test', '--ci']
+
+    inputs.files fileTree('api')
+    inputs.files fileTree('test')
+    inputs.file 'package.json'
+    inputs.file 'package-lock.json'
+
+    doLast {
+        new File(testsExecutedMarkerName).text = 'delete this file to force re-execution JavaScript tests'
+    }
+    outputs.file testsExecutedMarkerName
+}
+
+task apiBuild(type: NodeTask) {
+    inputs.files fileTree('api')
+
+    script = file("build.js")
+    args = [ "$project.projectDir/api/app.js","$project.buildDir/node"]
+
+    outputs.file "$project.buildDir/node/app.js";
+}
+
+task dockerLogin(type:Exec){
+    commandLine "docker", "login", "-u", "_json_key", "--password-stdin", "https://gcr.io"
+    standardInput new BufferedInputStream(new FileInputStream("key.json"))
+}
+
+task publish {
+    dependsOn build
+}
+
+dockerfileZip.dependsOn test
+apiBuild.dependsOn test
+docker.dependsOn test, apiBuild
+assemble.dependsOn "docker"
+clean.dependsOn stopMongo
+dockerPush.dependsOn assemble, dockerLogin
+
+clean {
+    delete testsExecutedMarkerName
+}
