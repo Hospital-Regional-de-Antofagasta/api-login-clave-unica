@@ -77,6 +77,7 @@ describe("Function login", () => {
 
       expect(res.send.mock.calls[0][0].token).toBeTruthy();
       expect(res.send.mock.calls[0][0].refresh_token).toBeTruthy();
+      expect(res.send.mock.calls[0][0].nombre_completo).toBeTruthy();
 
       const token = res.send.mock.calls[0][0].token;
 
