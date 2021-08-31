@@ -16,9 +16,6 @@ const refreshTokenExpiresIn = 60 * 60 * 24 * 365;
 
 exports.loginTest = async (req, res) => {
   try {
-    const nombreCompleto = req.query.nombreCompleto
-      ? req.query.nombreCompleto
-      : "testing";
     const rut = req.query.rut ? req.query.rut : "88888888-8";
     const expiresInTesting = req.query.tiempoToken
       ? req.query.tiempoToken
@@ -64,12 +61,16 @@ exports.loginTest = async (req, res) => {
     );
     await saveRefreshToken(refreshTokenKey, paciente, ipAddress);
 
+    const nombrePaciente = paciente.nombreSocial
+      ? [paciente.nombreSocial, paciente.apellidoPaterno, paciente.apellidoMaterno]
+      : [paciente.nombre, paciente.apellidoPaterno, paciente.apellidoMaterno]
+
     // si se hace la version web falta el httpOnly cookie en el refresh
     // token
     res.status(200).send({
       token: token,
       refresh_token: refreshToken,
-      nombre_completo: nombreCompleto,
+      nombre_completo: nombrePaciente,
     });
   } catch (error) {
     if (process.env.NODE_ENV === "dev")
@@ -86,7 +87,7 @@ exports.loginTest = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    const { nombreCompleto, rut } = req.body;
+    const { rut } = req.body;
 
     const ipAddress =
       req.headers["x-forwarded-for"] || req.connection.remoteAddress;
