@@ -17,6 +17,7 @@
     "@babel/cli": "^7.13.16",
     "@babel/core": "^7.14.0",
     "@babel/preset-env": "^7.14.1",
+    "cross-env": "^7.0.3",
     "dotenv": "^8.5.1",
     "esbuild": "^0.12.23",
     "jest": "^26.6.3",
@@ -25,12 +26,12 @@
   },
   "scripts": {
     "start": "node ./server.js",
-    "dev": "nodemon --exec node -r dotenv/config ./server.js",
+    "dev": "nodemon --exec node ./server.js",
     "babel-start": "node dist/server.js",
     "babel-build": "./node_modules/.bin/babel . -d dist --ignore node_modules,tests,.vscode,./dist",
     "babel-dev": "nodemon --exec babel-node ./server.js",
     "clean": "rimraf ./build",
-    "test": "jest",
+    "test": "cross-env MONGO_URI=mongodb://localhost:27017 jest",
     "test --watch": "jest --watch"
   },
   "repository": {

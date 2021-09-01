@@ -14,7 +14,7 @@ const secretRefreshToken = process.env.JWT_SECRET_REFRESH_TOKEN;
 
 beforeEach(async () => {
   await mongoose.disconnect();
-  await mongoose.connect(`${process.env.MONGO_URI_TEST}auth_controller_test`, {
+  await mongoose.connect(`${process.env.MONGO_URI}/auth_controller_test`, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
