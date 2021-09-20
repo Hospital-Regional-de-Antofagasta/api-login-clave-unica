@@ -1,12 +1,109 @@
+import org.unbrokendome.gradle.plugins.helm.command.tasks.*
+
 plugins{
     id "base"
     id "nl.eleven.node-gradle.node" version "1.0.0"
+    id "org.unbroken-dome.gitversion" version "0.10.0"
+    id 'org.unbroken-dome.helm' version '1.5.0'
+    id 'org.unbroken-dome.helm-commands' version '1.5.0'
+    id 'org.unbroken-dome.helm-publish' version '1.5.0'
+    id 'org.unbroken-dome.helm-releases' version '1.5.0'
+    id "com.google.osdetector" version "1.7.0"
+    id "com.github.rmee.kubectl" version "1.1.20200614081240"
+    id "com.github.rmee.gcloud" version "1.1.20200614081240"
     id "com.palantir.docker" version "0.28.0"
     id "com.palantir.docker-run" version "0.28.0"
 }
 
+
 var nodeVersion = "16.8.0"
-var tag = "1.0.0-SNAPSHOT"
+
+var projectId = System.getenv("PROJECT_ID")
+var clusterZone  = System.getenv("API_ZONE")
+var clusterName = System.getenv("API_CLUSTER")
+var apiKey = System.getenv("API_KEY")
+var mongoIp = System.getenv("MONGO_IP")
+
+
+
+gitVersion{
+    rules{
+        baseVersion = "1.0.0"
+
+        onBranch(~/feature\/(.+)/) {
+            def lastTag = findLatestTag ~/v?(\d+)\.(\d+)/
+
+            if(lastTag){
+                version.mayor = lastTag.mayor
+                version.minor = lastTag.minor
+                version.patch = lastTag.minor
+            }
+
+            version.prereleaseTag = matches[1]
+        }
+    }
+}
+
+//Aca se usa la version.
+version = gitVersion.determineVersion()
+String imageId = "gcr.io/$projectId/$project.name:$project.version"
+
+helm {
+
+    namespace = "cl-dssa-api"
+
+    downloadClient {
+        enabled = true
+        version = "3.6.3"
+    }
+
+    charts {
+        api {
+            chartName = "$project.name"
+            version = "$project.version"
+            sourceDir = file("$projectDir/helm/$project.name")
+        }
+    }
+
+    releases {
+        "api-login-clave-unica" {
+            from charts.api
+
+            forTarget('local') {
+                values.put('secrets.mongoUrl', "mongodb://$mongoIp:27017/hrapp_dev")
+            }
+
+            forTarget('staging') {
+                values.put('secrets.apiKey', apiKey)
+                values.put('secrets.mongoUrl', "mongodb://$mongoIp:27017/hrapp")
+            }
+
+            forTarget('production'){
+                values.put('secrets.apiKey', apiKey)
+                values.put('secrets.mongoUrl', "mongodb://$mongoIp:27017/hrapp")
+            }
+
+            forAnyTarget{
+                values.put('image.tag', project.version)
+            }
+        }
+    }
+
+    releaseTargets{
+        local {
+            kubeContext = "docker-desktop"
+        }
+
+        staging {
+            kubeContext = "gke_${projectId}_${clusterZone}_${clusterName}"
+        }
+
+        production {
+            kubeContext = "gke_${projectId}_${clusterZone}_${clusterName}"
+        }
+    }
+}
+
 
 node {
     download true
@@ -15,7 +112,7 @@ node {
 
 
 docker {
-    name "$project.name:$tag"
+    name imageId
     files fileTree("$project.buildDir/node")
 }
 
@@ -43,7 +140,6 @@ tasks.named("dockerRun"){t->
 
 task startMongo {
     dependsOn "dockerRun"
-    outputs.file runningMongo
 }
 
 task stopMongo {
@@ -54,7 +150,8 @@ task stopMongo {
     }
 }
 
-task test(type: NpmTask) {
+
+task testApi(type: NpmTask) {
     dependsOn npmInstall, startMongo
     environment CI: 'true'
 
@@ -68,6 +165,7 @@ task test(type: NpmTask) {
     doLast {
         new File(testsExecutedMarkerName).text = 'delete this file to force re-execution JavaScript tests'
     }
+
     outputs.file testsExecutedMarkerName
 }
 
@@ -77,25 +175,54 @@ task apiBuild(type: NodeTask) {
     script = file("build.js")
     args = [ "$project.projectDir/api/app.js","$project.buildDir/node"]
 
-    outputs.file "$project.buildDir/node/app.js";
+    outputs.file "$project.buildDir/node/app.js"
 }
 
-task dockerLogin(type:Exec){
+task gcrLogin(type:Exec){
     commandLine "docker", "login", "-u", "_json_key", "--password-stdin", "https://gcr.io"
     standardInput new BufferedInputStream(new FileInputStream("key.json"))
 }
 
-task publish {
-    dependsOn build
-}
-
-dockerfileZip.dependsOn test
-apiBuild.dependsOn test
-docker.dependsOn test, apiBuild
+dockerfileZip.dependsOn testApi
+apiBuild.dependsOn testApi
+dockerPrepare.dependsOn apiBuild
+tasks.named("docker").get().dependsOn testApi, apiBuild
 assemble.dependsOn "docker"
 clean.dependsOn stopMongo
-dockerPush.dependsOn assemble, dockerLogin
+dockerPush.dependsOn build, gcrLogin
+
+gcloud {
+    cli {
+        imageName = 'google/cloud-sdk'
+        imageTag = '352.0.0'
+    }
+
+    keyFile = file("$projectDir/key.json")
+    zone = clusterZone
+    project = "saludantofagasta-proy1"
+
+    gke {
+        clusterName = clusterName
+    }
+}
+
+gcloudSetProject.dependsOn gcloudActivateServiceAccount
+gcloudGetKubernetesCredentials.dependsOn gcloudSetProject
+
+task createNamespace(type:Exec){
+    commandLine 'kubectl', 'create','namespace','cl-dssa-api'
+    ignoreExitValue true
+}
+
+helmInstallApiLoginClaveUnicaToLocal.dependsOn dockerPush, createNamespace
+helmInstallApiLoginClaveUnicaToStaging.dependsOn dockerPush, gcloudGetKubernetesCredentials
+helmInstallApiLoginClaveUnicaToProduction.dependsOn dockerPush, gcloudGetKubernetesCredentials
+
 
 clean {
     delete testsExecutedMarkerName
+}
+
+task printVersion {
+    doLast { println project.version }
 }
