@@ -18,13 +18,13 @@ mongoose.connect(connection, {
   useUnifiedTopology: true,
 });
 
-app.use("/v1/auth", auth);
-
-app.use("/toapp", claveUnica);
-
 app.get("/health", (req, res) => {
   res.status(200).send("ready");
 });
+
+app.use("/v1/auth", auth);
+
+app.use("/toapp", claveUnica);
 
 if (require.main === module) {
   // true if file is executed
