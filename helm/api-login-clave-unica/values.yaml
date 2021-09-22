@@ -15,8 +15,13 @@ nameOverride: ""
 fullnameOverride: ""
 
 secrets:
-  apiKey: ""
+  jwtKey: ""
+  jwtRefreshKey: ""
   mongoUrl: "mongodb://mongo/hrapp"
+  cuClientKey: ""
+  cuSecretKey: ""
+  cuRedirectUri: ""
+  cuJwtKey: ""
 
 service:
   type: NodePort

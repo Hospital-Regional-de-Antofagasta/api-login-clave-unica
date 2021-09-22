@@ -21,8 +21,13 @@ var nodeVersion = "16.8.0"
 var projectId = System.getenv("PROJECT_ID")
 var clusterZone  = System.getenv("API_ZONE")
 var clusterName = System.getenv("API_CLUSTER")
-var apiKey = System.getenv("API_KEY")
+var jwtKey = System.getenv("JWT_KEY")
+var jwtRefreshKey = System.getenv("JWT_REFRESH_KEY")
 var mongoIp = System.getenv("MONGO_IP")
+var cuClientKey = System.getenv("CU_CLIENT_KEY")
+var cuSecretKey = System.getenv("CU_SECRET_KEY")
+var cuRedirectUri = System.getenv("CU_REDIRECT_URI")
+var cuJwtKey = System.getenv("CU_JWT_KEY")
 
 
 
@@ -70,17 +75,33 @@ helm {
             from charts.api
 
             forTarget('local') {
+                values.put('secrets.jwtKey', jwtKey)
+                values.put('secrets.jwtRefreshKey', jwtRefreshKey)
                 values.put('secrets.mongoUrl', "mongodb://$mongoIp:27017/hrapp_dev")
+                values.put('secrets.cuClientKey', cuClientKey)
+                values.put('secrets.cuSecretKey', cuSecretKey)
+                values.put('secrets.cuRedirectUri', cuRedirectUri)
+                values.put('secrets.cuJwtKey', cuJwtKey)
             }
 
             forTarget('staging') {
-                values.put('secrets.apiKey', apiKey)
+                values.put('secrets.jwtKey', jwtKey)
+                values.put('secrets.jwtRefreshKey', jwtRefreshKey)
                 values.put('secrets.mongoUrl', "mongodb://$mongoIp:27017/hrapp")
+                values.put('secrets.cuClientKey', cuClientKey)
+                values.put('secrets.cuSecretKey', cuSecretKey)
+                values.put('secrets.cuRedirectUri', cuRedirectUri)
+                values.put('secrets.cuJwtKey', cuJwtKey)
             }
 
             forTarget('production'){
-                values.put('secrets.apiKey', apiKey)
+                values.put('secrets.jwtKey', jwtKey)
+                values.put('secrets.jwtRefreshKey', jwtRefreshKey)
                 values.put('secrets.mongoUrl', "mongodb://$mongoIp:27017/hrapp")
+                values.put('secrets.cuClientKey', cuClientKey)
+                values.put('secrets.cuSecretKey', cuSecretKey)
+                values.put('secrets.cuRedirectUri', cuRedirectUri)
+                values.put('secrets.cuJwtKey', cuJwtKey)
             }
 
             forAnyTarget{
@@ -91,7 +112,7 @@ helm {
 
     releaseTargets{
         local {
-            kubeContext = "docker-desktop"
+            kubeContext = "kind-kind"
         }
 
         staging {
