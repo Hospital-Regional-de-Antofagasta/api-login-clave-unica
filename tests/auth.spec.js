@@ -1,14 +1,14 @@
 const supertest = require("supertest");
-const app = require("../app");
+const app = require("../api/app");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
-const Pacientes = require("../models/Pacientes");
-const RefreshToken = require("../models/RefreshToken");
-const pacientesSeed = require("../testSeeds/pacientesSeed.json");
-const refreshTokensSeed = require("../testSeeds/refreshTokensSeed.json");
-const { getMensajes } = require("../config");
-const ConfigApiLogin = require("../models/ConfigApiLogin");
-const configSeed = require("../testSeeds/configSeed.json");
+const Pacientes = require("../api/models/Pacientes");
+const RefreshToken = require("../api/models/RefreshToken");
+const pacientesSeed = require("./testSeeds/pacientesSeed.json");
+const refreshTokensSeed = require("./testSeeds/refreshTokensSeed.json");
+const { getMensajes } = require("../api/config");
+const ConfigApiLogin = require("../api/models/ConfigApiLogin");
+const configSeed = require("./testSeeds/configSeed.json");
 
 const request = supertest(app);
 
@@ -16,7 +16,7 @@ const secretRefreshToken = process.env.JWT_SECRET_REFRESH_TOKEN;
 
 beforeEach(async () => {
   await mongoose.disconnect();
-  await mongoose.connect(`${process.env.MONGO_URI_TEST}auth_test`, {
+  await mongoose.connect(`${process.env.MONGO_URI}/auth_test`, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });

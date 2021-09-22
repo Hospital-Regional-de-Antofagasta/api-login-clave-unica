@@ -1,11 +1,12 @@
+const app = require("../api/app");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
-const authController = require("./authController");
-const Pacientes = require("../models/Pacientes");
-const pacientesSeed = require("../testSeeds/pacientesSeed.json");
-const { getMensajes } = require("../config");
-const ConfigApiLogin = require("../models/ConfigApiLogin");
-const configSeed = require("../testSeeds/configSeed.json");
+const authController = require("../api/controller/authController");
+const Pacientes = require("../api/models/Pacientes");
+const pacientesSeed = require("./testSeeds/pacientesSeed.json");
+const { getMensajes } = require("../api/config");
+const ConfigApiLogin = require("../api/models/ConfigApiLogin");
+const configSeed = require("./testSeeds/configSeed.json");
 
 const secretToken = process.env.JWT_SECRET;
 
@@ -13,7 +14,7 @@ const secretRefreshToken = process.env.JWT_SECRET_REFRESH_TOKEN;
 
 beforeEach(async () => {
   await mongoose.disconnect();
-  await mongoose.connect(`${process.env.MONGO_URI_TEST}auth_controller_test`, {
+  await mongoose.connect(`${process.env.MONGO_URI}/auth_controller_test`, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });

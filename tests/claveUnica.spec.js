@@ -1,15 +1,15 @@
 const supertest = require("supertest");
-const app = require("../app");
+const app = require("../api/app");
 const mongoose = require("mongoose");
-const { getMensajes } = require("../config");
-const ConfigApiLogin = require("../models/ConfigApiLogin");
-const configSeed = require("../testSeeds/configSeed.json");
+const { getMensajes } = require("../api/config");
+const ConfigApiLogin = require("../api/models/ConfigApiLogin");
+const configSeed = require("./testSeeds/configSeed.json");
 
 const request = supertest(app);
 
 beforeEach(async () => {
   await mongoose.disconnect();
-  await mongoose.connect(`${process.env.MONGO_URI_TEST}clave_unica_test`, {
+  await mongoose.connect(`${process.env.MONGO_URI}/clave_unica_test`, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
