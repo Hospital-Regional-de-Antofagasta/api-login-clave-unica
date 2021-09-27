@@ -24,7 +24,7 @@ app.get("/health", (req, res) => {
 
 app.use("/v1/auth", auth);
 
-app.use("/toapp", claveUnica);
+app.use("/v1/clave-unica", claveUnica);
 
 if (require.main === module) {
   // true if file is executed

@@ -4,7 +4,7 @@ const authController = require("../controller/authController");
 
 const router = express.Router();
 
-router.get("/datos-clave-unica", claveUnicaController.datosCliente);
+router.get("/datos-conexion", claveUnicaController.datosCliente);
 
 router.get("", claveUnicaController.toapp, authController.login);
 

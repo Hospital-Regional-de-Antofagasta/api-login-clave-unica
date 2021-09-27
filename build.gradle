@@ -1,4 +1,4 @@
-import org.unbrokendome.gradle.plugins.helm.command.tasks.*
+import java.nio.charset.StandardCharsets
 
 plugins{
     id "base"
@@ -8,50 +8,158 @@ plugins{
     id 'org.unbroken-dome.helm-commands' version '1.5.0'
     id 'org.unbroken-dome.helm-publish' version '1.5.0'
     id 'org.unbroken-dome.helm-releases' version '1.5.0'
-    id "com.google.osdetector" version "1.7.0"
-    id "com.github.rmee.kubectl" version "1.1.20200614081240"
-    id "com.github.rmee.gcloud" version "1.1.20200614081240"
     id "com.palantir.docker" version "0.28.0"
     id "com.palantir.docker-run" version "0.28.0"
 }
 
 
 var nodeVersion = "16.8.0"
-
-var projectId = System.getenv("PROJECT_ID")
-var clusterZone  = System.getenv("API_ZONE")
-var clusterName = System.getenv("API_CLUSTER")
-var jwtKey = System.getenv("JWT_KEY")
-var jwtRefreshKey = System.getenv("JWT_REFRESH_KEY")
-var mongoIp = System.getenv("MONGO_IP")
-var cuClientKey = System.getenv("CU_CLIENT_KEY")
-var cuSecretKey = System.getenv("CU_SECRET_KEY")
-var cuRedirectUri = System.getenv("CU_REDIRECT_URI")
-var cuJwtKey = System.getenv("CU_JWT_KEY")
-
-
+var projectId = System.getenv("PROJECT_ID") ?: "project"
+var clusterZone = System.getenv("API_ZONE") ?: "ZONE"
+var clusterNombre = System.getenv("API_CLUSTER") ?: "CLUSTER"
+var jwtKey = System.getenv("API_KEY") ?: "0123456789ABCDEF"
+var mongoIp = System.getenv("MONGO_IP") ?: "localhost"
+var jwtRefreshKey = System.getenv("JWT_REFRESH_KEY") ?: "0123456789ABCDEF"
+var cuClientKey = System.getenv("CU_CLIENT_KEY") ?: "0123456789ABCDEF"
+var cuSecretKey = System.getenv("CU_SECRET_KEY") ?: "0123456789ABCDEF"
+var cuRedirectUri = System.getenv("CU_REDIRECT_URI") ?: "0123456789ABCDEF"
+var cuJwtKey = System.getenv("CU_JWT_KEY") ?: "0123456789ABCDEF"
+var keyJson = System.getenv("KEY") ?: "{}"
+var commitId
 
 gitVersion{
     rules{
         baseVersion = "1.0.0"
 
-        onBranch(~/feature\/(.+)/) {
-            def lastTag = findLatestTag ~/v?(\d+)\.(\d+)/
+        always{
+            commitId = head.id
+        }
 
-            if(lastTag){
-                version.mayor = lastTag.mayor
-                version.minor = lastTag.minor
-                version.patch = lastTag.minor
+        onBranch('master'){
+            def tag = findLatestTag ~/v?(\d+\.\d+\.\d+)/
+            version = tag.matches[1]
+            version.buildMetadata = "sha256:${head.id}"
+        }
+
+        onBranch(~/hotfix\/.+/){
+            def commits = countCommitsSince branchPoint('master')
+            def tag = findLatestTag ~/v?(\d+).(\d+).(\d+)/
+            def major = tag.matches[1].toInteger()
+            def minor = tag.matches[2].toInteger()
+            def patch = tag.matches[3].toInteger() + 1
+            def tagPatchBeta = findLatestTag ~/v?$major.$minor.$patch-beta\.(\d+).+/
+
+            println tagPatchBeta
+
+            def betaVersion = 1
+            if(tagPatchBeta){
+                betaVersion = tagPatchBeta.matches[1].toInteger() + 1
+            }
+            version.major = major
+            version.minor = minor
+            version.patch = patch
+            version.prereleaseTag = "beta.$betaVersion"
+            version.buildMetadata = "$commits"
+
+        }
+
+        onBranch(~/bugfix\/(.+)/){
+            def branchRelease = branchPoint(~/release\/(\d+).(\d+).0/)
+            def commitsFromDevelop = countCommitsSince branchPoint('develop')
+            def commitsFromRelease = countCommitsSince branchRelease
+            def major = branchRelease.matches[1].toInteger()
+            def minor = branchRelease.matches[2].toInteger()
+            def betaVersion = 1
+            def tag = findLatestTag ~/v?$major.$minor.0-beta\.(\d+).+/
+            if(tag){
+                betaVersion = tag.matches[1].toInteger() + 1
             }
 
-            version.prereleaseTag = matches[1]
+            version.major = major
+            version.minor = minor
+            version.patch = 0
+            version.prereleaseTag = "beta.$betaVersion"
+            version.buildMetadata = "$commitsFromDevelop-${matches[1]}.$commitsFromRelease"
+        }
+
+        onBranch(~/release\/(\d+).(\d+).0/){
+            def commits = countCommitsSince branchPoint(~/.*develop/)
+            def major = matches[1].toInteger()
+            def minor = matches[2].toInteger()
+            def betaVersion = 1
+            def tag = findLatestTag ~/v?$major.$minor.0-beta\.(\d+).+/
+            if(tag){
+                betaVersion = tag.matches[1].toInteger() + 1
+            }
+
+            version.major = major
+            version.minor = minor
+            version.patch = 0
+            version.prereleaseTag = "beta.$betaVersion"
+            version.buildMetadata = "$commits"
+        }
+
+        onBranch('develop'){
+            def lastTag = findLatestTag ~/v?((\d+)\.(\d+)\.0)/, true
+            def branch = branchPoint ~/.*\/release\/((\d+).(\d+).(\d+))/
+
+            def versionMatchers
+            int commits = 0
+
+            if(lastTag && branch){
+                if (lastTag.matches[1] < branch.matches[1]){
+                    commits =  countCommitsSince  branch, true
+                    versionMatchers = branch.matches
+                }
+                else {
+                    commits = countCommitsSince lastTag, true
+                    versionMatchers = lastTag.matches
+                }
+            }
+
+            if( versionMatchers==null && lastTag ){
+                commits = countCommitsSince lastTag, true
+                versionMatchers = lastTag.matches
+            }
+
+            if(versionMatchers) {
+                version.major = versionMatchers[2].toInteger()
+                version.minor = versionMatchers[3].toInteger() + 1
+                version.patch = 0
+            }
+            else {
+                commits =  countCommitsSince branchPoint(~/.*\/master/), true
+            }
+
+            version.prereleaseTag = "alpha.$commits"
+        }
+
+        onBranch(~/feature\/(.+)/) {
+            def lastTag = findLatestTag ~/v?(\d+)\.(\d+).(\d+)-\D+\.?(\d+)/
+            int commitsFromLastTag
+            int commitsFromDevelop = countCommitsSince branchPoint('develop'), true
+
+            if(lastTag){
+                version.major = lastTag.matches[1].toInteger()
+                version.minor = lastTag.matches[2].toInteger()
+                version.patch = lastTag.matches[3].toInteger()
+                commitsFromLastTag = lastTag.matches[4]
+            } else {
+                commitsFromLastTag =  countCommitsSince branchPoint('master'), true
+            }
+
+            version.prereleaseTag = "${matches[1]}.$commitsFromLastTag"
+            version.buildMetadata = "$commitsFromDevelop"
         }
     }
 }
 
 //Aca se usa la version.
-version = gitVersion.determineVersion()
-String imageId = "gcr.io/$projectId/$project.name:$project.version"
+def versionActual = gitVersion.determineVersion()
+version = versionActual
+def versionImg = "$versionActual".replace('+','-')
+
+String imageId = "gcr.io/$projectId/$project.name:$versionImg"
 
 helm {
 
@@ -84,7 +192,7 @@ helm {
                 values.put('secrets.cuJwtKey', cuJwtKey)
             }
 
-            forTarget('staging') {
+            forTarget('cloud') {
                 values.put('secrets.jwtKey', jwtKey)
                 values.put('secrets.jwtRefreshKey', jwtRefreshKey)
                 values.put('secrets.mongoUrl', "mongodb://$mongoIp:27017/hrapp")
@@ -105,7 +213,7 @@ helm {
             }
 
             forAnyTarget{
-                values.put('image.tag', project.version)
+                values.put('image.tag', versionImg)
             }
         }
     }
@@ -115,12 +223,8 @@ helm {
             kubeContext = "kind-kind"
         }
 
-        staging {
-            kubeContext = "gke_${projectId}_${clusterZone}_${clusterName}"
-        }
-
-        production {
-            kubeContext = "gke_${projectId}_${clusterZone}_${clusterName}"
+        cloud {
+            kubeContext = "gke_${projectId}_${clusterZone}_${clusterNombre}"
         }
     }
 }
@@ -199,9 +303,18 @@ task apiBuild(type: NodeTask) {
     outputs.file "$project.buildDir/node/app.js"
 }
 
+task generateKeyFile{
+    doLast {
+        new File(projectDir, "key.json").text = System.getenv("KEY")?:"{}"
+    }
+}
+
+task versionTxt()  {
+}
 task gcrLogin(type:Exec){
+    dependsOn generateKeyFile
     commandLine "docker", "login", "-u", "_json_key", "--password-stdin", "https://gcr.io"
-    standardInput new BufferedInputStream(new FileInputStream("key.json"))
+    standardInput new ByteArrayInputStream(keyJson.getBytes(StandardCharsets.UTF_8))
 }
 
 dockerfileZip.dependsOn testApi
@@ -212,38 +325,30 @@ assemble.dependsOn "docker"
 clean.dependsOn stopMongo
 dockerPush.dependsOn build, gcrLogin
 
-gcloud {
-    cli {
-        imageName = 'google/cloud-sdk'
-        imageTag = '352.0.0'
-    }
-
-    keyFile = file("$projectDir/key.json")
-    zone = clusterZone
-    project = "saludantofagasta-proy1"
-
-    gke {
-        clusterName = clusterName
-    }
-}
-
-gcloudSetProject.dependsOn gcloudActivateServiceAccount
-gcloudGetKubernetesCredentials.dependsOn gcloudSetProject
-
 task createNamespace(type:Exec){
     commandLine 'kubectl', 'create','namespace','cl-dssa-api'
+
     ignoreExitValue true
 }
 
-helmInstallApiLoginClaveUnicaToLocal.dependsOn dockerPush, createNamespace
-helmInstallApiLoginClaveUnicaToStaging.dependsOn dockerPush, gcloudGetKubernetesCredentials
-helmInstallApiLoginClaveUnicaToProduction.dependsOn dockerPush, gcloudGetKubernetesCredentials
+task gcloudLogin(type:Exec) {
+    commandLine "gcloud", "auth", "activate-service-account"
+    args "--key-file", "key.json"
+    args "--project", "$projectId"
+}
+
+task gcloudGetContextCredentials(type:Exec){
+    dependsOn gcloudLogin
+
+    commandLine "gcloud", "container", "clusters", "get-credentials", "$clusterNombre"
+    args "--zone", "$clusterZone"
+    args "--project", "$projectId"
+}
+
+helmInstallApiConfiguracionToLocal.dependsOn dockerPush, createNamespace
+helmInstallApiConfiguracionToCloud.dependsOn dockerPush, gcloudGetContextCredentials
 
 
 clean {
     delete testsExecutedMarkerName
-}
-
-task printVersion {
-    doLast { println project.version }
 }
