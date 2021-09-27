@@ -1,4 +1,4 @@
-  name: Despliegue continuo a PROD
+  name: Despliegue continuo a produccion
   on:
     push:
       branches:
