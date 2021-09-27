@@ -1,0 +1,32 @@
+name: Integración continua
+on:
+  push:
+    branches:
+      - develop
+jobs:
+  setup-build:
+    name: Configurar, Construir
+    runs-on: ubuntu-latest
+    env:
+      PROJECT_ID: ${{ secrets.CGP_PROJECT }}
+      KEY: ${{ secrets.GCP_KEY }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Build Test
+        env:
+          MONGO_URI: "mongodb://localhost:27017/hrapp_dev"
+          PORT: "3000"
+          HOST_NAME: "localhost"
+          JWT_SECRET: "TEST"
+          JWT_SECRET_REFRESH_TOKEN: "TEST"
+          CLIENT_ID: "TEST"
+          CLIENT_SECRET: "TEST"
+          REDIRECT_URI: "http://redirect-uri/v1/clave-unica"
+          JWT_SECRET_CLAVE_UNICA: "TEST"
+        run: |
+          chmod +x ./gradlew
+          ./gradlew build

@@ -1,0 +1,42 @@
+  name: Despliegue continuo a PROD
+  on:
+    push:
+      branches:
+        - master
+  jobs:
+    setup-build:
+      name: Configurar, Construir
+      runs-on: ubuntu-latest
+      env:
+        PROJECT_ID: ${{ secrets.CGP_PROJECT }}
+        KEY: ${{ secrets.GCP_KEY }}
+        API_ZONE: ${{ secrets.GCP_ZONE_PROD }}
+        API_CLUSTER: ${{ secrets.GCP_CLUSTER_PROD }}
+        API_KEY: ${{ secrets.API_KEY }}
+        MONGO_IP: ${{ secrets.MONGO_IP_PROD }}
+        JWT_REFRESH_KEY: ${{ secrets.JWT_REFRESH_KEY }}
+        CU_CLIENT_KEY: ${{ secrets.CU_CLIENT_KEY_PROD }}
+        CU_SECRET_KEY: ${{ secrets.CU_SECRET_KEY_PROD }}
+        CU_REDIRECT_URI: ${{ secrets.CU_REDIRECT_URI_PROD }}
+        CU_JWT_KEY: ${{ secrets.CU_JWT_KEY }}
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v2
+          with:
+            fetch-depth: 0
+
+        - name: Build Test
+          env:
+            #Variables usadas solo para la ejecución de las pruebas
+            MONGO_URI: "mongodb://localhost:27017/hrapp_dev"
+            PORT: "3000"
+            HOST_NAME: "localhost"
+            JWT_SECRET: "TEST"
+            JWT_SECRET_REFRESH_TOKEN: "TEST"
+            CLIENT_ID: "TEST"
+            CLIENT_SECRET: "TEST"
+            REDIRECT_URI: "http://redirect-uri/v1/clave-unica"
+            JWT_SECRET_CLAVE_UNICA: "TEST"
+          run: |
+            chmod +x ./gradlew
+            ./gradlew helmInstallApiConfiguracionToCloud
