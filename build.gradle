@@ -345,8 +345,8 @@ task gcloudGetContextCredentials(type:Exec){
     args "--project", "$projectId"
 }
 
-helmInstallApiConfiguracionToLocal.dependsOn dockerPush, createNamespace
-helmInstallApiConfiguracionToCloud.dependsOn dockerPush, gcloudGetContextCredentials
+helmInstallApiLoginClaveUnicaToLocal.dependsOn dockerPush, createNamespace
+helmInstallApiLoginClaveUnicaToCloud.dependsOn dockerPush, gcloudGetContextCredentials
 
 
 clean {
