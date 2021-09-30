@@ -62,7 +62,7 @@ exports.toapp = async (req, res, next) => {
 
     next();
   } catch (error) {
-    if (true)
+    if (process.env.NODE_ENV === "dev")
       return res.status(500).send({
         respuesta: await getMensajes("serverError"),
         detalles_error: {

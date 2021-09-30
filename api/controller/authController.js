@@ -62,8 +62,12 @@ exports.loginTest = async (req, res) => {
     await saveRefreshToken(refreshTokenKey, paciente, ipAddress);
 
     const nombrePaciente = paciente.nombreSocial
-      ? [paciente.nombreSocial, paciente.apellidoPaterno, paciente.apellidoMaterno]
-      : [paciente.nombre, paciente.apellidoPaterno, paciente.apellidoMaterno]
+      ? [
+          paciente.nombreSocial,
+          paciente.apellidoPaterno,
+          paciente.apellidoMaterno,
+        ]
+      : [paciente.nombre, paciente.apellidoPaterno, paciente.apellidoMaterno];
 
     // si se hace la version web falta el httpOnly cookie en el refresh
     // token
@@ -130,8 +134,12 @@ exports.login = async (req, res) => {
     await saveRefreshToken(refreshTokenKey, paciente, ipAddress);
 
     const nombrePaciente = paciente.nombreSocial
-      ? [paciente.nombreSocial, paciente.apellidoPaterno, paciente.apellidoMaterno]
-      : [paciente.nombre, paciente.apellidoPaterno, paciente.apellidoMaterno]
+      ? [
+          paciente.nombreSocial,
+          paciente.apellidoPaterno,
+          paciente.apellidoMaterno,
+        ]
+      : [paciente.nombre, paciente.apellidoPaterno, paciente.apellidoMaterno];
 
     // si se hace la version web falta el httpOnly cookie en el refresh
     // token
@@ -141,7 +149,7 @@ exports.login = async (req, res) => {
       nombre_completo: nombrePaciente,
     });
   } catch (error) {
-    if (true)
+    if (process.env.NODE_ENV === "dev")
       return res.status(500).send({
         respuesta: await getMensajes("serverError"),
         detalles_error: {
