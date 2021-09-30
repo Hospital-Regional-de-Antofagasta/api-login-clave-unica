@@ -141,7 +141,7 @@ exports.login = async (req, res) => {
       nombre_completo: nombrePaciente,
     });
   } catch (error) {
-    if (process.env.NODE_ENV === "dev")
+    if (true)
       return res.status(500).send({
         respuesta: await getMensajes("serverError"),
         detalles_error: {
