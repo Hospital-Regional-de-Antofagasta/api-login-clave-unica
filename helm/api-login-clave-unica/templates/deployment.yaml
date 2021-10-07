@@ -44,7 +44,7 @@ spec:
               port: {{ .Values.service.targetPort }}
           env:
             - name: NODE_ENV
-              value: prod
+              value: {{ .Values.enviroment  }}
             - name: PORT
               value: "{{ .Values.service.targetPort }}"
             - name: HOSTNAME

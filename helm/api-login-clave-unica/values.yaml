@@ -23,6 +23,8 @@ secrets:
   cuRedirectUri: ""
   cuJwtKey: ""
 
+enviroment: prod
+
 service:
   type: NodePort
   port: 80
