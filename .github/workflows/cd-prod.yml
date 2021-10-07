@@ -38,7 +38,6 @@
             CLIENT_SECRET: "TEST"
             REDIRECT_URI: "http://redirect-uri/v1/clave-unica"
             JWT_SECRET_CLAVE_UNICA: "TEST"
-            NODE_ENV: "prod"
           run: |
             chmod +x ./gradlew
             ./gradlew helmInstallApiConfiguracionToCloud
