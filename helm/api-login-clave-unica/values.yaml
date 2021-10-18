@@ -22,6 +22,8 @@ secrets:
   cuSecretKey: ""
   cuRedirectUri: ""
   cuJwtKey: ""
+  iJwtKey: ""
+  iJwtKeyRefresh: ""
 
 enviroment: prod
 

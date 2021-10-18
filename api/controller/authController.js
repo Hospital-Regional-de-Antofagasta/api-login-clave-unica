@@ -313,9 +313,6 @@ exports.loginInternalUser = async (req, res) => {
 
     const encryptedPassword = key.toString("base64");
 
-    console.log("user.password", user.password)
-    console.log("encryptedPassword", encryptedPassword)
-
     if (user.password !== encryptedPassword)
       return res
         .status(400)
@@ -536,7 +533,6 @@ const decodeToken = async (token, secret) => {
 const randomBytes = async (size) => {
   const result = await new Promise((resolve, reject) => {
     crypto.randomBytes(size, (err, salt) => {
-      console.log("salt", salt.toString())
       if (err) return resolve(false);
       return resolve(salt);
     });
