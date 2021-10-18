@@ -27,6 +27,8 @@ jobs:
           CLIENT_SECRET: "TEST"
           REDIRECT_URI: "http://redirect-uri/v1/clave-unica"
           JWT_SECRET_CLAVE_UNICA: "TEST"
+          JWT_SECRET_INTERNO: "TEST"
+          JWT_SECRET_REFRESH_TOKEN_INTERNO: "TEST"
         run: |
           chmod +x ./gradlew
           ./gradlew build
