@@ -26,6 +26,8 @@ var cuRedirectUri = System.getenv("CU_REDIRECT_URI") ?: "0123456789ABCDEF"
 var cuJwtKey = System.getenv("CU_JWT_KEY") ?: "0123456789ABCDEF"
 var keyJson = System.getenv("KEY") ?: "{}"
 var nodeEnv = System.getenv("NODE_ENV") ?: "prod"
+var iJwtKey = System.getenv("I_JWT_KEY") ?: "0123456789ABCDEF"
+var iJwtKeyRefresh = System.getenv("I_JWT_KEY_REFRESH") ?: "0123456789ABCDEF"
 var commitId
 
 gitVersion{
@@ -193,6 +195,8 @@ helm {
                 values.put('secrets.cuSecretKey', cuSecretKey)
                 values.put('secrets.cuRedirectUri', cuRedirectUri)
                 values.put('secrets.cuJwtKey', cuJwtKey)
+                values.put('secrets.iJwtKey', iJwtKey)
+                values.put('secrets.iJwtKeyRefresh', iJwtKeyRefresh)
             }
 
             forTarget('cloud') {
@@ -204,6 +208,8 @@ helm {
                 values.put('secrets.cuSecretKey', cuSecretKey)
                 values.put('secrets.cuRedirectUri', cuRedirectUri)
                 values.put('secrets.cuJwtKey', cuJwtKey)
+                values.put('secrets.iJwtKey', iJwtKey)
+                values.put('secrets.iJwtKeyRefresh', iJwtKeyRefresh)
             }
 
             forAnyTarget{

@@ -20,6 +20,8 @@
         CU_REDIRECT_URI: ${{ secrets.CU_REDIRECT_URI_PROD }}
         CU_JWT_KEY: ${{ secrets.CU_JWT_KEY }}
         NODE_ENV: "prod"
+        I_JWT_KEY: ${{ secrets.I_JWT_KEY_PROD }}
+        I_JWT_KEY_REFRESH: ${{ secrets.I_JWT_KEY_REFRESH_PROD }}
       steps:
         - name: Checkout
           uses: actions/checkout@v2
@@ -38,6 +40,8 @@
             CLIENT_SECRET: "TEST"
             REDIRECT_URI: "http://redirect-uri/v1/clave-unica"
             JWT_SECRET_CLAVE_UNICA: "TEST"
+            I_JWT_KEY: "TEST"
+            I_JWT_KEY_REFRESH: "TEST"
           run: |
             chmod +x ./gradlew
             ./gradlew helmInstallApiConfiguracionToCloud

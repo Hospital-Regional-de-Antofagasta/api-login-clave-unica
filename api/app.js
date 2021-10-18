@@ -2,12 +2,14 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+var cookieParser = require('cookie-parser')
 const auth = require("./routes/auth");
 const claveUnica = require("./routes/claveUnica");
 
 const app = express();
 app.use(express.json());
 app.use(cors());
+app.use(cookieParser());
 
 const connection = process.env.MONGO_URI;
 const port = process.env.PORT;
