@@ -1,0 +1,20 @@
+[
+  {
+    "_id": "61832a43c8a4d50009607cab",
+    "userName": "usuario",
+    "password": "UWu9Cl5KFMrdG9lhXh10PdRKE46WRp19KxOUlbyFQQ73ooUMo/voKsBM378yd2K3jDSUbhCLFJaBNiKNqLJ8xw==",
+    "salt": "hash"
+  },
+  {
+    "_id": "62832a43c8a4d50009607cab",
+    "userName": "usuario2",
+    "password": "encrypted",
+    "salt": "hash"
+  },
+  {
+    "_id": "63832a43c8a4d50009607cab",
+    "userName": "usuario3",
+    "password": "encrypted",
+    "salt": "hash"
+  }
+]
