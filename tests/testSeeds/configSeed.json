@@ -48,6 +48,12 @@
         "mensaje": "El usuario ingresado ya existe. -test",
         "color": " -test",
         "icono": " -test"
+      },
+      "forbiddenAccess": {
+        "titulo": "Alerta -test",
+        "mensaje": "Su sesión ha expirado. -test",
+        "color": " -test",
+        "icono": " -test"
       }
     },
     "version": 1

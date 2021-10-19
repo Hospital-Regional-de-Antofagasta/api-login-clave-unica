@@ -49,6 +49,12 @@ const mensajesPorDefecto = {
     color: "",
     icono: "",
   },
+  forbiddenAccess: {
+    titulo: "Alerta",
+    mensaje: "Su sesión ha expirado.",
+    color: "",
+    icono: "",
+  },
 };
 
 exports.getMensajes = async (tipo) => {

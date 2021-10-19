@@ -1,5 +1,6 @@
 const express = require("express");
 const authController = require("../controller/authController");
+const { isAuthenticated } = require("../middleware/authInterno");
 const {
   validarUsuario,
   validarContrasenia,
@@ -13,6 +14,7 @@ router.post("/refresh-token", authController.refreshToken);
 
 router.post(
   "/interno/register",
+  isAuthenticated,
   validarUsuario,
   validarContrasenia,
   authController.registerInternalUser

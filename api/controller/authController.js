@@ -17,7 +17,8 @@ const secretRefreshTokenInterno =
   process.env.JWT_SECRET_REFRESH_TOKEN_INTERNO;
 
 // seconds, minutes, hours, days
-const expiresIn = 60 * 15 * 1 * 1;
+// const expiresIn = 60 * 15 * 1 * 1;
+const expiresIn = 30 * 1 * 1 * 1;
 
 // seconds, minutes, hours, days
 const refreshTokenExpiresIn = 60 * 60 * 24 * 365;
