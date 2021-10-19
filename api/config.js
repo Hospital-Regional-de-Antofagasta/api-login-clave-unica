@@ -50,8 +50,14 @@ const mensajesPorDefecto = {
     icono: "",
   },
   forbiddenAccess: {
-    titulo: "Alerta",
+    titulo: "Acceso Denegado",
     mensaje: "Su sesión ha expirado.",
+    color: "",
+    icono: "",
+  },
+  insufficientPermission: {
+    titulo: "Acceso Denegado",
+    mensaje: "No tiene los permisos para realizar esta acción.",
     color: "",
     icono: "",
   },

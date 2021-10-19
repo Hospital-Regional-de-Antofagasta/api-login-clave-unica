@@ -50,8 +50,14 @@
         "icono": " -test"
       },
       "forbiddenAccess": {
-        "titulo": "Alerta -test",
+        "titulo": "Acceso Denegado -test",
         "mensaje": "Su sesión ha expirado. -test",
+        "color": " -test",
+        "icono": " -test"
+      },
+      "insufficientPermission": {
+        "titulo": "Acceso Denegado -test",
+        "mensaje": "No tiene los permisos para realizar esta acción. -test",
         "color": " -test",
         "icono": " -test"
       }
