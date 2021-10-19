@@ -211,7 +211,9 @@ describe("Endpoints auth", () => {
         .set("Authorization", tokenInterno)
         .send(postData);
 
-      const usuario = await UsuariosInternos.findOne({ userName: "usuario5" }).exec();
+      const usuario = await UsuariosInternos.findOne({
+        userName: "usuario5",
+      }).exec();
 
       const mensaje = await getMensajes("userCreated");
 
@@ -225,7 +227,7 @@ describe("Endpoints auth", () => {
         },
       });
 
-      expect(usuario).toBeTruthy()
+      expect(usuario).toBeTruthy();
 
       done();
     });
@@ -240,7 +242,9 @@ describe("Endpoints auth", () => {
         .set("Authorization", tokenInterno)
         .send(postData);
 
-      const usuario = await UsuariosInternos.findOne({ userName: "usuario6" }).exec();
+      const usuario = await UsuariosInternos.findOne({
+        userName: "usuario6",
+      }).exec();
 
       const mensaje = await getMensajes("userCreated");
 
@@ -254,14 +258,16 @@ describe("Endpoints auth", () => {
         },
       });
 
-      expect(usuario).toBeTruthy()
+      expect(usuario).toBeTruthy();
 
       done();
     });
   });
   describe("Put /cambiar-contrasenia", () => {
     it("Should not change user pasword without a token", async (done) => {
-      const response = await request.put("/v1/auth-interno/cambiar-contrasenia");
+      const response = await request.put(
+        "/v1/auth-interno/cambiar-contrasenia"
+      );
 
       const mensaje = await getMensajes("forbiddenAccess");
 
@@ -301,7 +307,32 @@ describe("Endpoints auth", () => {
         .put("/v1/auth-interno/cambiar-contrasenia")
         .set("Authorization", tokenInterno);
 
-      const mensaje = await getMensajes("invalidPassword");
+      const mensaje = await getMensajes("invalidUserName");
+
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        respuesta: {
+          titulo: mensaje.titulo,
+          mensaje: mensaje.mensaje,
+          color: mensaje.color,
+          icono: mensaje.icono,
+        },
+      });
+
+      done();
+    });
+    it("Should not change user password if userName name is invalid", async (done) => {
+      const postData = {
+        userName: "u",
+        password: "encrypted",
+      };
+
+      const response = await request
+        .put("/v1/auth-interno/cambiar-contrasenia")
+        .set("Authorization", tokenInterno)
+        .send(postData);
+
+      const mensaje = await getMensajes("invalidUserName");
 
       expect(response.status).toBe(400);
       expect(response.body).toEqual({
@@ -317,6 +348,7 @@ describe("Endpoints auth", () => {
     });
     it("Should not change user password if password has invalid length", async (done) => {
       const postData = {
+        userName: "usuario",
         password: "123Asd!",
       };
 
@@ -341,6 +373,7 @@ describe("Endpoints auth", () => {
     });
     it("Should not change user password if password has invalid caracters", async (done) => {
       const postData = {
+        userName: "usuario",
         password: "asd123asd",
       };
 
@@ -363,12 +396,40 @@ describe("Endpoints auth", () => {
 
       done();
     });
-    it("Should change user password", async (done) => {
+    it("Should not change user password if user doesnt exists", async (done) => {
       const postData = {
+        userName: "usuario25",
         password: "encrypteD1!",
       };
 
-      const usuarioAntes = await UsuariosInternos.findById(userId).exec();
+      const response = await request
+        .put("/v1/auth-interno/cambiar-contrasenia")
+        .set("Authorization", tokenInterno)
+        .send(postData);
+
+      const mensaje = await getMensajes("invalidUserName");
+
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        respuesta: {
+          titulo: mensaje.titulo,
+          mensaje: mensaje.mensaje,
+          color: mensaje.color,
+          icono: mensaje.icono,
+        },
+      });
+
+      done();
+    });
+    it("Should change user password", async (done) => {
+      const postData = {
+        userName: "usuario",
+        password: "encrypteD1!",
+      };
+
+      const usuarioAntes = await UsuariosInternos.findOne({
+        userName: "usuario",
+      }).exec();
 
       const response = await request
         .put("/v1/auth-interno/cambiar-contrasenia")
@@ -377,7 +438,9 @@ describe("Endpoints auth", () => {
 
       const mensaje = await getMensajes("passwordChanged");
 
-      const usuarioDespues = await UsuariosInternos.findById(userId).exec();
+      const usuarioDespues = await UsuariosInternos.findOne({
+        userName: "usuario",
+      }).exec();
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual({
@@ -389,7 +452,7 @@ describe("Endpoints auth", () => {
         },
       });
 
-      expect(usuarioAntes.password).not.toBe(usuarioDespues.password)
+      expect(usuarioAntes.password).not.toBe(usuarioDespues.password);
 
       done();
     });
@@ -452,7 +515,7 @@ describe("Endpoints auth", () => {
     });
     it("Should delete user", async (done) => {
       const postData = {
-        userName: "admin"
+        userName: "admin",
       };
 
       const response = await request
@@ -462,7 +525,9 @@ describe("Endpoints auth", () => {
 
       const mensaje = await getMensajes("userDeleted");
 
-      const usuario = await UsuariosInternos.findOne({ userName: "admin" }).exec();
+      const usuario = await UsuariosInternos.findOne({
+        userName: "admin",
+      }).exec();
 
       const refreshToken = await RefreshTokenInterno.findOne({
         user_id: usuario._id,
@@ -479,8 +544,8 @@ describe("Endpoints auth", () => {
         },
       });
 
-      expect(usuario.role).toBeFalsy()
-      expect(refreshToken).toBeFalsy()
+      expect(usuario.role).toBeFalsy();
+      expect(refreshToken).toBeFalsy();
 
       done();
     });
@@ -566,9 +631,7 @@ describe("Endpoints auth", () => {
   });
   describe("Post /refresh-token", () => {
     it("Should not generate new token if there is not a refresh token", async (done) => {
-      const response = await request.post(
-        "/v1/auth-interno/refresh-token"
-      );
+      const response = await request.post("/v1/auth-interno/refresh-token");
 
       const mensaje = await getMensajes("unauthorizedRefresh");
 

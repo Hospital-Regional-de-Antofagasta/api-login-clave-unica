@@ -61,7 +61,7 @@ exports.registerInternalUser = async (req, res) => {
 
 exports.changePasswordInternalUser = async (req, res) => {
   try {
-    const { password } = req.body;
+    const { userName, password } = req.body;
 
     const newSalt = await randomBytes(16);
 
@@ -70,7 +70,7 @@ exports.changePasswordInternalUser = async (req, res) => {
     const encryptedPassword = key.toString("base64");
 
     await UsuariosInternos.updateOne(
-      { _id: req.user._id },
+      { userName },
       {
         password: encryptedPassword,
         salt: newSalt,

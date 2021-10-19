@@ -5,6 +5,7 @@ const {
   validarUsuario,
   validarContrasenia,
   validarUsuarioNoExiste,
+  validarUsuarioExiste,
 } = require("../middleware/validacionLoginInternalUser");
 
 const router = express.Router();
@@ -37,6 +38,8 @@ router.put(
   "/cambiar-contrasenia",
   isAuthenticated,
   hasRole(["admin"]),
+  validarUsuario,
+  validarUsuarioExiste,
   validarContrasenia,
   authInternoController.changePasswordInternalUser
 );
