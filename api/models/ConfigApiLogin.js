@@ -65,6 +65,18 @@ const ConfigApiLogin = mongoose.model(
         color: String,
         icono: String,
       },
+      passwordChanged: {
+        titulo: String,
+        mensaje: String,
+        color: String,
+        icono: String,
+      },
+      userDeleted: {
+        titulo: String,
+        mensaje: String,
+        color: String,
+        icono: String,
+      },
     },
     version: Number,
   }),

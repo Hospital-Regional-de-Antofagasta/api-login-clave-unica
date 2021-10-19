@@ -38,7 +38,7 @@ const mensajesPorDefecto = {
     icono: "",
   },
   userCreated: {
-    titulo: "Usuario Creado",
+    titulo: "Usuario creado",
     mensaje: "El usuario fue creado con éxito",
     color: "",
     icono: "",
@@ -58,6 +58,18 @@ const mensajesPorDefecto = {
   insufficientPermission: {
     titulo: "Acceso Denegado",
     mensaje: "No tiene los permisos para realizar esta acción.",
+    color: "",
+    icono: "",
+  },
+  passwordChanged: {
+    titulo: "Contraseña modificada",
+    mensaje: "La contraseña fue modificada con éxito.",
+    color: "",
+    icono: "",
+  },
+  userDeleted: {
+    titulo: "Usuario eliminado",
+    mensaje: "El usuario fue eliminado con éxito.",
     color: "",
     icono: "",
   },

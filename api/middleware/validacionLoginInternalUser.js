@@ -44,7 +44,26 @@ exports.validarUsuario = async (req, res, next) => {
         .status(400)
         .send({ respuesta: await getMensajes("invalidUserName") });
 
-    const user = await UsuariosInternos.findOne({ userName }).exec();
+    next();
+  } catch (error) {
+    if (process.env.NODE_ENV === "dev")
+      return res.status(500).send({
+        respuesta: await getMensajes("serverError"),
+        detalles_error: {
+          nombre: error.name,
+          mensaje: error.message,
+        },
+      });
+    res.status(500).send({ respuesta: await getMensajes("serverError") });
+  }
+};
+
+exports.validarUsuarioNoExiste = async (req, res, next) => {
+  try {
+    const { userName } = req.body;
+
+    const user = await UsuariosInternos.findOne({ userName, role: { $ne: null} }).exec();
+
     if (user)
       return res
         .status(400)

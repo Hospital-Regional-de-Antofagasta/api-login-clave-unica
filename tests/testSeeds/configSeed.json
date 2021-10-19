@@ -60,6 +60,18 @@
         "mensaje": "No tiene los permisos para realizar esta acción. -test",
         "color": " -test",
         "icono": " -test"
+      },
+      "passwordChanged": {
+        "titulo": "Contraseña modificada -test",
+        "mensaje": "La contraseña fue modificada con éxito. -test",
+        "color": " -test",
+        "icono": " -test"
+      },
+      "userDeleted": {
+        "titulo": "Usuario eliminado -test",
+        "mensaje": "El usuario fue eliminado con éxito. -test",
+        "color": " -test",
+        "icono": " -test"
       }
     },
     "version": 1

@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 var cookieParser = require('cookie-parser')
 const auth = require("./routes/auth");
+const authInterno = require("./routes/authInterno");
 const claveUnica = require("./routes/claveUnica");
 
 const app = express();
@@ -25,6 +26,8 @@ app.get("/health", (req, res) => {
 });
 
 app.use("/v1/auth", auth);
+
+app.use("/v1/auth-interno", authInterno);
 
 app.use("/v1/clave-unica", claveUnica);
 
