@@ -53,6 +53,18 @@ const ConfigApiLogin = mongoose.model(
         color: String,
         icono: String,
       },
+      forbiddenAccess: {
+        titulo: String,
+        mensaje: String,
+        color: String,
+        icono: String,
+      },
+      insufficientPermission: {
+        titulo: String,
+        mensaje: String,
+        color: String,
+        icono: String,
+      },
     },
     version: Number,
   }),

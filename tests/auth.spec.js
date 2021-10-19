@@ -16,9 +16,18 @@ const refreshTokensInternosSeed = require("./testSeeds/refreshTokensInternosSeed
 
 const request = supertest(app);
 
+const secretoInterno = process.env.JWT_SECRET_INTERNO;
+
 const secretRefreshToken = process.env.JWT_SECRET_REFRESH_TOKEN;
 
 const secretRefreshTokenInterno = process.env.JWT_SECRET_REFRESH_TOKEN_INTERNO;
+
+const tokenInterno = jwt.sign(
+  {
+    _id: "61832a43c8a4d50009607cab",
+  },
+  secretoInterno
+);
 
 beforeEach(async () => {
   await mongoose.disconnect();
@@ -144,8 +153,44 @@ describe("Endpoints auth", () => {
     });
   });
   describe("Post /interno/register", () => {
-    it("Should not create new user if recieved data is null", async (done) => {
+    it("Should not create new user without a token", async (done) => {
       const response = await request.post("/v1/auth/interno/register");
+
+      const mensaje = await getMensajes("forbiddenAccess");
+
+      expect(response.status).toBe(401);
+      expect(response.body).toEqual({
+        respuesta: {
+          titulo: mensaje.titulo,
+          mensaje: mensaje.mensaje,
+          color: mensaje.color,
+          icono: mensaje.icono,
+        },
+      });
+
+      done();
+    });
+    it("Should not create new user without a valid token", async (done) => {
+      const response = await request.post("/v1/auth/interno/register")
+        .set("Authorization", "token-no-valido");
+
+      const mensaje = await getMensajes("forbiddenAccess");
+
+      expect(response.status).toBe(401);
+      expect(response.body).toEqual({
+        respuesta: {
+          titulo: mensaje.titulo,
+          mensaje: mensaje.mensaje,
+          color: mensaje.color,
+          icono: mensaje.icono,
+        },
+      });
+
+      done();
+    });
+    it("Should not create new user if recieved data is null", async (done) => {
+      const response = await request.post("/v1/auth/interno/register")
+        .set("Authorization", tokenInterno);
 
       const mensaje = await getMensajes("invalidUserName");
 
@@ -169,6 +214,7 @@ describe("Endpoints auth", () => {
 
       const response = await request
         .post("/v1/auth/interno/register")
+        .set("Authorization", tokenInterno)
         .send(postData);
 
       const mensaje = await getMensajes("invalidUserName");
@@ -193,6 +239,7 @@ describe("Endpoints auth", () => {
 
       const response = await request
         .post("/v1/auth/interno/register")
+        .set("Authorization", tokenInterno)
         .send(postData);
 
       const mensaje = await getMensajes("userAlredyExists");
@@ -217,6 +264,7 @@ describe("Endpoints auth", () => {
 
       const response = await request
         .post("/v1/auth/interno/register")
+        .set("Authorization", tokenInterno)
         .send(postData);
 
       const mensaje = await getMensajes("invalidPassword");
@@ -241,6 +289,7 @@ describe("Endpoints auth", () => {
 
       const response = await request
         .post("/v1/auth/interno/register")
+        .set("Authorization", tokenInterno)
         .send(postData);
 
       const mensaje = await getMensajes("invalidPassword");
@@ -265,6 +314,7 @@ describe("Endpoints auth", () => {
 
       const response = await request
         .post("/v1/auth/interno/register")
+        .set("Authorization", tokenInterno)
         .send(postData);
 
       const mensaje = await getMensajes("userCreated");

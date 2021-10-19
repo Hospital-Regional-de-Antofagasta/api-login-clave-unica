@@ -49,6 +49,18 @@ const mensajesPorDefecto = {
     color: "",
     icono: "",
   },
+  forbiddenAccess: {
+    titulo: "Acceso Denegado",
+    mensaje: "Su sesión ha expirado.",
+    color: "",
+    icono: "",
+  },
+  insufficientPermission: {
+    titulo: "Acceso Denegado",
+    mensaje: "No tiene los permisos para realizar esta acción.",
+    color: "",
+    icono: "",
+  },
 };
 
 exports.getMensajes = async (tipo) => {

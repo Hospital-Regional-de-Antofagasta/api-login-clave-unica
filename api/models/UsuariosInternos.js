@@ -8,6 +8,7 @@ const UsuariosInternos = mongoose.model(
       userName: String,
       password: String,
       salt: Buffer,
+      role: { type: String, default: 'user' },
     },
     { timestamps: true }
   )

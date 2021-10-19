@@ -48,6 +48,18 @@
         "mensaje": "El usuario ingresado ya existe. -test",
         "color": " -test",
         "icono": " -test"
+      },
+      "forbiddenAccess": {
+        "titulo": "Acceso Denegado -test",
+        "mensaje": "Su sesión ha expirado. -test",
+        "color": " -test",
+        "icono": " -test"
+      },
+      "insufficientPermission": {
+        "titulo": "Acceso Denegado -test",
+        "mensaje": "No tiene los permisos para realizar esta acción. -test",
+        "color": " -test",
+        "icono": " -test"
       }
     },
     "version": 1
