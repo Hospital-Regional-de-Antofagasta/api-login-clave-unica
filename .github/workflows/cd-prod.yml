@@ -40,4 +40,4 @@
             JWT_SECRET_CLAVE_UNICA: "TEST"
           run: |
             chmod +x ./gradlew
-            ./gradlew helmInstallApiConfiguracionToCloud
+            ./gradlew helmInstallApiLoginClaveUnicaToCloud

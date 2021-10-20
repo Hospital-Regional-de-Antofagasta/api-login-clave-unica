@@ -39,7 +39,7 @@ gitVersion{
         onBranch('master'){
             def tag = findLatestTag ~/v?(\d+\.\d+\.\d+)/
             version = tag.matches[1]
-            version.buildMetadata = "sha256:${head.id}"
+            version.buildMetadata = "sha256-${head.id}"
         }
 
         onBranch(~/hotfix\/.+/){
@@ -174,7 +174,7 @@ helm {
     charts {
         api {
             chartName = "$project.name"
-            version = "$project.version"
+            version = "$versionImg"
             sourceDir = file("$projectDir/helm/$project.name")
         }
     }
