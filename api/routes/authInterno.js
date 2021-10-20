@@ -35,7 +35,7 @@ router.post(
 // );
 
 router.put(
-  "/cambiar-contrasenia",
+  "/cambiar-contrasenia/:userName",
   isAuthenticated,
   hasRole(["admin"]),
   validarUsuario,
@@ -44,8 +44,8 @@ router.put(
   authInternoController.changePasswordInternalUser
 );
 
-router.post(
-  "/eliminar-usuario",
+router.delete(
+  "/eliminar-usuario/:userName",
   isAuthenticated,
   hasRole(["admin"]),
   validarUsuario,

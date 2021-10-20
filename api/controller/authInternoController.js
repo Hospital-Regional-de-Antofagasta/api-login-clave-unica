@@ -61,7 +61,8 @@ exports.registerInternalUser = async (req, res) => {
 
 exports.changePasswordInternalUser = async (req, res) => {
   try {
-    const { userName, password } = req.body;
+    const { userName } = req.params;
+    const { password } = req.body;
 
     const newSalt = await randomBytes(16);
 
@@ -93,7 +94,7 @@ exports.changePasswordInternalUser = async (req, res) => {
 
 exports.deleteInternalUser = async (req, res) => {
   try {
-    const { userName } = req.body;
+    const { userName } = req.params;
     const ipAddress =
       req.headers["x-forwarded-for"] || req.connection.remoteAddress;
 

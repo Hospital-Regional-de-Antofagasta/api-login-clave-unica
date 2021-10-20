@@ -263,10 +263,10 @@ describe("Endpoints auth", () => {
       done();
     });
   });
-  describe("Put /cambiar-contrasenia", () => {
+  describe("Put /cambiar-contrasenia/:userName", () => {
     it("Should not change user pasword without a token", async (done) => {
       const response = await request.put(
-        "/v1/auth-interno/cambiar-contrasenia"
+        "/v1/auth-interno/cambiar-contrasenia/usuario"
       );
 
       const mensaje = await getMensajes("forbiddenAccess");
@@ -285,7 +285,7 @@ describe("Endpoints auth", () => {
     });
     it("Should not change user pasword without a valid token", async (done) => {
       const response = await request
-        .put("/v1/auth-interno/cambiar-contrasenia")
+        .put("/v1/auth-interno/cambiar-contrasenia/usuario")
         .set("Authorization", "token-no-valido");
 
       const mensaje = await getMensajes("forbiddenAccess");
@@ -302,33 +302,13 @@ describe("Endpoints auth", () => {
 
       done();
     });
-    it("Should not change user password if recieved data is null", async (done) => {
-      const response = await request
-        .put("/v1/auth-interno/cambiar-contrasenia")
-        .set("Authorization", tokenInterno);
-
-      const mensaje = await getMensajes("invalidUserName");
-
-      expect(response.status).toBe(400);
-      expect(response.body).toEqual({
-        respuesta: {
-          titulo: mensaje.titulo,
-          mensaje: mensaje.mensaje,
-          color: mensaje.color,
-          icono: mensaje.icono,
-        },
-      });
-
-      done();
-    });
     it("Should not change user password if userName name is invalid", async (done) => {
       const postData = {
-        userName: "u",
         password: "encrypted",
       };
 
       const response = await request
-        .put("/v1/auth-interno/cambiar-contrasenia")
+        .put("/v1/auth-interno/cambiar-contrasenia/u")
         .set("Authorization", tokenInterno)
         .send(postData);
 
@@ -348,12 +328,11 @@ describe("Endpoints auth", () => {
     });
     it("Should not change user password if password has invalid length", async (done) => {
       const postData = {
-        userName: "usuario",
         password: "123Asd!",
       };
 
       const response = await request
-        .put("/v1/auth-interno/cambiar-contrasenia")
+        .put("/v1/auth-interno/cambiar-contrasenia/usuario")
         .set("Authorization", tokenInterno)
         .send(postData);
 
@@ -373,12 +352,11 @@ describe("Endpoints auth", () => {
     });
     it("Should not change user password if password has invalid caracters", async (done) => {
       const postData = {
-        userName: "usuario",
         password: "asd123asd",
       };
 
       const response = await request
-        .put("/v1/auth-interno/cambiar-contrasenia")
+        .put("/v1/auth-interno/cambiar-contrasenia/usuario")
         .set("Authorization", tokenInterno)
         .send(postData);
 
@@ -398,12 +376,11 @@ describe("Endpoints auth", () => {
     });
     it("Should not change user password if user doesnt exists", async (done) => {
       const postData = {
-        userName: "usuario25",
         password: "encrypteD1!",
       };
 
       const response = await request
-        .put("/v1/auth-interno/cambiar-contrasenia")
+        .put("/v1/auth-interno/cambiar-contrasenia/usuario25")
         .set("Authorization", tokenInterno)
         .send(postData);
 
@@ -423,7 +400,6 @@ describe("Endpoints auth", () => {
     });
     it("Should change user password", async (done) => {
       const postData = {
-        userName: "usuario",
         password: "encrypteD1!",
       };
 
@@ -432,7 +408,7 @@ describe("Endpoints auth", () => {
       }).exec();
 
       const response = await request
-        .put("/v1/auth-interno/cambiar-contrasenia")
+        .put("/v1/auth-interno/cambiar-contrasenia/usuario")
         .set("Authorization", tokenInterno)
         .send(postData);
 
@@ -457,9 +433,9 @@ describe("Endpoints auth", () => {
       done();
     });
   });
-  describe("Delete /", () => {
+  describe("Delete /eliminar-usuario/:userName", () => {
     it("Should not user without a token", async (done) => {
-      const response = await request.post("/v1/auth-interno/eliminar-usuario");
+      const response = await request.delete("/v1/auth-interno/eliminar-usuario/usuario");
 
       const mensaje = await getMensajes("forbiddenAccess");
 
@@ -477,7 +453,7 @@ describe("Endpoints auth", () => {
     });
     it("Should not delete user without a valid token", async (done) => {
       const response = await request
-        .post("/v1/auth-interno/eliminar-usuario")
+        .delete("/v1/auth-interno/eliminar-usuario/usuario")
         .set("Authorization", "token-no-valido");
 
       const mensaje = await getMensajes("forbiddenAccess");
@@ -494,34 +470,10 @@ describe("Endpoints auth", () => {
 
       done();
     });
-    it("Should not delete user without a user to delete", async (done) => {
-      const response = await request
-        .post("/v1/auth-interno/eliminar-usuario")
-        .set("Authorization", tokenInterno);
-
-      const mensaje = await getMensajes("invalidUserName");
-
-      expect(response.status).toBe(400);
-      expect(response.body).toEqual({
-        respuesta: {
-          titulo: mensaje.titulo,
-          mensaje: mensaje.mensaje,
-          color: mensaje.color,
-          icono: mensaje.icono,
-        },
-      });
-
-      done();
-    });
     it("Should delete user", async (done) => {
-      const postData = {
-        userName: "admin",
-      };
-
       const response = await request
-        .post("/v1/auth-interno/eliminar-usuario")
-        .set("Authorization", tokenInterno)
-        .send(postData);
+        .delete("/v1/auth-interno/eliminar-usuario/admin")
+        .set("Authorization", tokenInterno);
 
       const mensaje = await getMensajes("userDeleted");
 

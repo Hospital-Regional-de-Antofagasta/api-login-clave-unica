@@ -33,7 +33,10 @@ exports.validarContrasenia = async (req, res, next) => {
 
 exports.validarUsuario = async (req, res, next) => {
   try {
-    const { userName } = req.body;
+    const userName = req.params.userName
+      ? req.params.userName
+      : req.body.userName;
+    // const { userName } = req.body;
     if (!userName)
       return res
         .status(400)
@@ -60,9 +63,15 @@ exports.validarUsuario = async (req, res, next) => {
 
 exports.validarUsuarioNoExiste = async (req, res, next) => {
   try {
-    const { userName } = req.body;
+    const userName = req.params.userName
+      ? req.params.userName
+      : req.body.userName;
+    // const { userName } = req.body;
 
-    const user = await UsuariosInternos.findOne({ userName, role: { $ne: null} }).exec();
+    const user = await UsuariosInternos.findOne({
+      userName,
+      role: { $ne: null },
+    }).exec();
 
     if (user)
       return res
@@ -85,7 +94,10 @@ exports.validarUsuarioNoExiste = async (req, res, next) => {
 
 exports.validarUsuarioExiste = async (req, res, next) => {
   try {
-    const { userName } = req.body;
+    const userName = req.params.userName
+      ? req.params.userName
+      : req.body.userName;
+    // const { userName } = req.body;
 
     const usuario = await UsuariosInternos.findOne({ userName }).exec();
 
