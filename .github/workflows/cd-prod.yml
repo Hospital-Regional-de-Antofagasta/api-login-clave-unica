@@ -44,4 +44,4 @@
             JWT_SECRET_REFRESH_TOKEN_INTERNO: "TEST"
           run: |
             chmod +x ./gradlew
-            ./gradlew helmInstallApiConfiguracionToCloud
+            ./gradlew helmInstallApiLoginClaveUnicaToCloud
