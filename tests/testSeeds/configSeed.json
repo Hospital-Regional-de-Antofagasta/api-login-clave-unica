@@ -1,0 +1,25 @@
+[
+  {
+    "mensajes": {
+      "unauthorized": {
+        "titulo": "Alerta -test",
+        "mensaje": "No se encuentra en los registros del hospital. -test",
+        "color": " -test",
+        "icono": " -test"
+      },
+      "unauthorizedRefresh": {
+        "titulo": "Alerta -test",
+        "mensaje": "Su sesión ha expirado. -test",
+        "color": " -test",
+        "icono": " -test"
+      },
+      "serverError": {
+        "titulo": "Alerta -test",
+        "mensaje": "Ocurrió un error inesperado. -test",
+        "color": " -test",
+        "icono": " -test"
+      }
+    },
+    "version": 1
+  }
+]

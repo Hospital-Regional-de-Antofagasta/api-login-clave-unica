@@ -18,10 +18,11 @@ dist/
 
 # Package files
 *.jar
+!/gradle/**/*.jar
 
 # Maven
 target/
-dist/
+
 
 # JetBrains IDE
 .idea/
@@ -48,3 +49,14 @@ Thumbs.db
 *.mov
 *.wmv
 
+# Envairomental variables
+.env
+.env.dev
+
+# Ignore Gradle project-specific cache directory
+.gradle
+
+# Ignore Gradle build output directory
+build
+/.tests.*
+/key.json

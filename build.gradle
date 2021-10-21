@@ -1,0 +1,348 @@
+import java.nio.charset.StandardCharsets
+
+plugins{
+    id "base"
+    id "nl.eleven.node-gradle.node" version "1.0.0"
+    id "org.unbroken-dome.gitversion" version "0.10.0"
+    id 'org.unbroken-dome.helm' version '1.5.0'
+    id 'org.unbroken-dome.helm-commands' version '1.5.0'
+    id 'org.unbroken-dome.helm-publish' version '1.5.0'
+    id 'org.unbroken-dome.helm-releases' version '1.5.0'
+    id "com.palantir.docker" version "0.28.0"
+    id "com.palantir.docker-run" version "0.28.0"
+}
+
+
+var nodeVersion = "16.8.0"
+var projectId = System.getenv("PROJECT_ID") ?: "project"
+var clusterZone = System.getenv("API_ZONE") ?: "ZONE"
+var clusterNombre = System.getenv("API_CLUSTER") ?: "CLUSTER"
+var jwtKey = System.getenv("API_KEY") ?: "0123456789ABCDEF"
+var mongoIp = System.getenv("MONGO_IP") ?: "localhost"
+var jwtRefreshKey = System.getenv("JWT_REFRESH_KEY") ?: "0123456789ABCDEF"
+var cuClientKey = System.getenv("CU_CLIENT_KEY") ?: "0123456789ABCDEF"
+var cuSecretKey = System.getenv("CU_SECRET_KEY") ?: "0123456789ABCDEF"
+var cuRedirectUri = System.getenv("CU_REDIRECT_URI") ?: "0123456789ABCDEF"
+var cuJwtKey = System.getenv("CU_JWT_KEY") ?: "0123456789ABCDEF"
+var keyJson = System.getenv("KEY") ?: "{}"
+var nodeEnv = System.getenv("NODE_ENV") ?: "prod"
+var commitId
+
+gitVersion{
+    rules{
+        baseVersion = "1.0.0"
+
+        always{
+            commitId = head.id
+        }
+
+        onBranch('master'){
+            def tag = findLatestTag ~/v?(\d+\.\d+\.\d+)/
+            version = tag.matches[1]
+            version.buildMetadata = "sha256-${head.id}"
+        }
+
+        onBranch(~/hotfix\/.+/){
+            def commits = countCommitsSince branchPoint('master')
+            def tag = findLatestTag ~/v?(\d+).(\d+).(\d+)/
+            def major = tag.matches[1].toInteger()
+            def minor = tag.matches[2].toInteger()
+            def patch = tag.matches[3].toInteger() + 1
+            def tagPatchBeta = findLatestTag ~/v?$major.$minor.$patch-beta\.(\d+).+/
+
+            println tagPatchBeta
+
+            def betaVersion = 1
+            if(tagPatchBeta){
+                betaVersion = tagPatchBeta.matches[1].toInteger() + 1
+            }
+            version.major = major
+            version.minor = minor
+            version.patch = patch
+            version.prereleaseTag = "beta.$betaVersion"
+            version.buildMetadata = "$commits"
+
+        }
+
+        onBranch(~/bugfix\/(.+)/){
+            def branchRelease = branchPoint(~/release\/(\d+).(\d+).0/)
+            def commitsFromDevelop = countCommitsSince branchPoint('develop')
+            def commitsFromRelease = countCommitsSince branchRelease
+            def major = branchRelease.matches[1].toInteger()
+            def minor = branchRelease.matches[2].toInteger()
+            def betaVersion = 1
+            def tag = findLatestTag ~/v?$major.$minor.0-beta\.(\d+).+/
+            if(tag){
+                betaVersion = tag.matches[1].toInteger() + 1
+            }
+
+            version.major = major
+            version.minor = minor
+            version.patch = 0
+            version.prereleaseTag = "beta.$betaVersion"
+            version.buildMetadata = "$commitsFromDevelop-${matches[1]}.$commitsFromRelease"
+        }
+
+        onBranch(~/release\/(\d+).(\d+).0/){
+            def commits = countCommitsSince branchPoint(~/.*develop/)
+            def major = matches[1].toInteger()
+            def minor = matches[2].toInteger()
+            def betaVersion = 1
+            def tag = findLatestTag ~/v?$major.$minor.0-beta\.(\d+).+/
+            if(tag){
+                betaVersion = tag.matches[1].toInteger() + 1
+            }
+
+            version.major = major
+            version.minor = minor
+            version.patch = 0
+            version.prereleaseTag = "beta.$betaVersion"
+            version.buildMetadata = "$commits"
+        }
+
+        onBranch('develop'){
+            def lastTag = findLatestTag ~/v?((\d+)\.(\d+)\.0)/, true
+            def branch = branchPoint ~/.*\/release\/((\d+).(\d+).(\d+))/
+
+            def versionMatchers
+            int commits = 0
+
+            if(lastTag && branch){
+                if (lastTag.matches[1] < branch.matches[1]){
+                    commits =  countCommitsSince  branch, true
+                    versionMatchers = branch.matches
+                }
+                else {
+                    commits = countCommitsSince lastTag, true
+                    versionMatchers = lastTag.matches
+                }
+            }
+
+            if( versionMatchers==null && lastTag ){
+                commits = countCommitsSince lastTag, true
+                versionMatchers = lastTag.matches
+            }
+
+            if(versionMatchers) {
+                version.major = versionMatchers[2].toInteger()
+                version.minor = versionMatchers[3].toInteger() + 1
+                version.patch = 0
+            }
+            else {
+                commits =  countCommitsSince branchPoint(~/.*\/master/), true
+            }
+
+            version.prereleaseTag = "alpha.$commits"
+        }
+
+        onBranch(~/feature\/(.+)/) {
+            def lastTag = findLatestTag ~/v?(\d+)\.(\d+).(\d+)-\D+\.?(\d+)/
+            int commitsFromLastTag
+            int commitsFromDevelop = countCommitsSince branchPoint('develop'), true
+
+            if(lastTag){
+                version.major = lastTag.matches[1].toInteger()
+                version.minor = lastTag.matches[2].toInteger()
+                version.patch = lastTag.matches[3].toInteger()
+                commitsFromLastTag = lastTag.matches[4]
+            } else {
+                commitsFromLastTag =  countCommitsSince branchPoint('master'), true
+            }
+
+            version.prereleaseTag = "${matches[1]}.$commitsFromLastTag"
+            version.buildMetadata = "$commitsFromDevelop"
+        }
+    }
+}
+
+//Aca se usa la version.
+def versionActual = gitVersion.determineVersion()
+version = versionActual
+def versionImg = "$versionActual".replace('+','-')
+
+String imageId = "gcr.io/$projectId/$project.name:$versionImg"
+
+helm {
+
+    namespace = "cl-dssa-api"
+
+    downloadClient {
+        enabled = true
+        version = "3.6.3"
+    }
+
+    charts {
+        api {
+            chartName = "$project.name"
+            version = "$versionImg"
+            sourceDir = file("$projectDir/helm/$project.name")
+        }
+    }
+
+    releases {
+        "api-login-clave-unica" {
+            from charts.api
+
+            forTarget('local') {
+                values.put('enviroment', nodeEnv)
+                values.put('secrets.jwtKey', jwtKey)
+                values.put('secrets.jwtKey', jwtKey)
+                values.put('secrets.jwtRefreshKey', jwtRefreshKey)
+                values.put('secrets.mongoUrl', "mongodb://$mongoIp:27017/hrapp_dev")
+                values.put('secrets.cuClientKey', cuClientKey)
+                values.put('secrets.cuSecretKey', cuSecretKey)
+                values.put('secrets.cuRedirectUri', cuRedirectUri)
+                values.put('secrets.cuJwtKey', cuJwtKey)
+            }
+
+            forTarget('cloud') {
+                values.put('enviroment', nodeEnv)
+                values.put('secrets.jwtKey', jwtKey)
+                values.put('secrets.jwtRefreshKey', jwtRefreshKey)
+                values.put('secrets.mongoUrl', "mongodb://$mongoIp:27017/hrapp")
+                values.put('secrets.cuClientKey', cuClientKey)
+                values.put('secrets.cuSecretKey', cuSecretKey)
+                values.put('secrets.cuRedirectUri', cuRedirectUri)
+                values.put('secrets.cuJwtKey', cuJwtKey)
+            }
+
+            forAnyTarget{
+                values.put('image.tag', versionImg)
+            }
+        }
+    }
+
+    releaseTargets{
+        local {
+            kubeContext = "kind-kind"
+        }
+
+        cloud {
+            kubeContext = "gke_${projectId}_${clusterZone}_${clusterNombre}"
+        }
+    }
+}
+
+
+node {
+    download true
+    version nodeVersion
+}
+
+
+docker {
+    name imageId
+    files fileTree("$project.buildDir/node")
+}
+
+dockerRun {
+    name  "mongo"
+    image "mongo:5.0"
+    ports  "27017:27017"
+    daemonize true
+    ignoreExitValue true
+}
+
+String testsExecutedMarkerName = "${projectDir}/.tests.executed"
+String runningMongo = "${projectDir}/.tests.mongo"
+
+tasks.named("dockerRemoveContainer"){t-> t.dependsOn(dockerStop)}
+
+tasks.named("dockerRun"){t->
+    {
+        t.doLast {
+            new File(runningMongo).text = "Running mongo"
+        }
+        t.outputs.file runningMongo
+    }
+}
+
+task startMongo {
+    dependsOn "dockerRun"
+}
+
+task stopMongo {
+    dependsOn dockerRemoveContainer
+
+    doLast {
+        delete runningMongo
+    }
+}
+
+
+task testApi(type: NpmTask) {
+    dependsOn npmInstall, startMongo
+    environment CI: 'true'
+
+    args = ['run', 'test', '--ci']
+
+    inputs.files fileTree('api')
+    inputs.files fileTree('test')
+    inputs.file 'package.json'
+    inputs.file 'package-lock.json'
+
+    doLast {
+        new File(testsExecutedMarkerName).text = 'delete this file to force re-execution JavaScript tests'
+    }
+
+    outputs.file testsExecutedMarkerName
+}
+
+task apiBuild(type: NodeTask) {
+    inputs.files fileTree('api')
+
+    script = file("build.js")
+    args = [ "$project.projectDir/api/app.js","$project.buildDir/node"]
+
+    outputs.file "$project.buildDir/node/app.js"
+}
+
+task generateKeyFile{
+    doLast {
+        new File(projectDir, "key.json").text = System.getenv("KEY")?:"{}"
+    }
+}
+
+task versionTxt()  {
+}
+task gcrLogin(type:Exec){
+    dependsOn generateKeyFile
+    commandLine "docker", "login", "-u", "_json_key", "--password-stdin", "https://gcr.io"
+    standardInput new ByteArrayInputStream(keyJson.getBytes(StandardCharsets.UTF_8))
+}
+
+dockerfileZip.dependsOn testApi
+apiBuild.dependsOn testApi
+dockerPrepare.dependsOn apiBuild
+tasks.named("docker").get().dependsOn testApi, apiBuild
+assemble.dependsOn "docker"
+clean.dependsOn stopMongo
+dockerPush.dependsOn build, gcrLogin
+
+task createNamespace(type:Exec){
+    commandLine 'kubectl', 'create','namespace','cl-dssa-api'
+
+    ignoreExitValue true
+}
+
+task gcloudLogin(type:Exec) {
+    commandLine "gcloud", "auth", "activate-service-account"
+    args "--key-file", "key.json"
+    args "--project", "$projectId"
+}
+
+task gcloudGetContextCredentials(type:Exec){
+    dependsOn gcloudLogin
+
+    commandLine "gcloud", "container", "clusters", "get-credentials", "$clusterNombre"
+    args "--zone", "$clusterZone"
+    args "--project", "$projectId"
+}
+
+helmInstallApiLoginClaveUnicaToLocal.dependsOn dockerPush, createNamespace
+helmInstallApiLoginClaveUnicaToCloud.dependsOn dockerPush, gcloudGetContextCredentials
+
+
+clean {
+    delete testsExecutedMarkerName
+}
