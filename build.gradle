@@ -164,7 +164,7 @@ String imageId = "gcr.io/$projectId/$project.name:$versionImg"
 
 helm {
 
-    namespace = "cl-dssa-api"
+    namespace = "cl-hra-api"
 
     downloadClient {
         enabled = true
@@ -320,7 +320,7 @@ clean.dependsOn stopMongo
 dockerPush.dependsOn build, gcrLogin
 
 task createNamespace(type:Exec){
-    commandLine 'kubectl', 'create','namespace','cl-dssa-api'
+    commandLine 'kubectl', 'create','namespace','cl-hra-api'
 
     ignoreExitValue true
 }
