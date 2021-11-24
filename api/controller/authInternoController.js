@@ -152,11 +152,12 @@ exports.loginInternalUser = async (req, res) => {
         .status(400)
         .send({ respuesta: await getMensajes("invalidLoginData") });
 
-    // res.send({ token });
+    delete user.password;
+    delete user.salt;
 
     const token = signToken(
       {
-        _id: user._id,
+        user,
       },
       expiresIn,
       secretTokenInterno
@@ -194,6 +195,7 @@ exports.loginInternalUser = async (req, res) => {
       })
       .send({
         token: token,
+        role: user.role,
       });
   } catch (error) {
     if (process.env.NODE_ENV === "dev")
@@ -280,9 +282,12 @@ exports.refreshTokenInternalUser = async (req, res, next) => {
 
     await saveRefreshTokenInterno(newRefreshTokenKey, user, ipAddress);
 
+    delete user.password;
+    delete user.salt;
+
     const token = signToken(
       {
-        _id: user._id,
+        user,
       },
       expiresIn,
       secretTokenInterno
@@ -298,6 +303,7 @@ exports.refreshTokenInternalUser = async (req, res, next) => {
       })
       .send({
         token: token,
+        role: user.role,
       });
   } catch (error) {
     if (process.env.NODE_ENV === "dev")

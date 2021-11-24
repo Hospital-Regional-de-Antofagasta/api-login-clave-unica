@@ -20,8 +20,8 @@ exports.isAuthenticated = async (req, res, next) => {
           .status(401)
           .send({ respuesta: await getMensajes("forbiddenAccess") });
 
-      const { _id } = decoded;
-      req.user = await UsuariosInternos.findById(_id).exec();
+      const { user } = decoded;
+      req.user = user;
 
       next();
     });

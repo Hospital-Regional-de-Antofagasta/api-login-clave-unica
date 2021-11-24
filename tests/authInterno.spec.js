@@ -20,7 +20,11 @@ const userId = "61832a43c8a4d50009607cab";
 
 const tokenInterno = jwt.sign(
   {
-    _id: userId,
+    user: {
+      _id: "61832a43c8a4d50009607cab",
+      userName: "admin",
+      role: "admin",
+    },
   },
   secretoInterno
 );
@@ -435,7 +439,9 @@ describe("Endpoints auth", () => {
   });
   describe("Delete /eliminar-usuario/:userName", () => {
     it("Should not user without a token", async (done) => {
-      const response = await request.delete("/v1/auth-interno/eliminar-usuario/usuario");
+      const response = await request.delete(
+        "/v1/auth-interno/eliminar-usuario/usuario"
+      );
 
       const mensaje = await getMensajes("forbiddenAccess");
 
