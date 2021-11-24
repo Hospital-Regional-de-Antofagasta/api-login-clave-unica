@@ -60,7 +60,7 @@ exports.toapp = async (req, res, next) => {
       rut,
     };
 
-    await cerrarSesionClaveUnica(access_token);
+    // await cerrarSesionClaveUnica(access_token);
 
     next();
   } catch (error) {
