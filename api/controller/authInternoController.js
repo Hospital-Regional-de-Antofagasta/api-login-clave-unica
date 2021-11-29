@@ -152,12 +152,13 @@ exports.loginInternalUser = async (req, res) => {
         .status(400)
         .send({ respuesta: await getMensajes("invalidLoginData") });
 
-    delete user.password;
-    delete user.salt;
-
     const token = signToken(
       {
-        user,
+        user: {
+          _id: user._id,
+          userName: user.userName,
+          role: user.role,
+        },
       },
       expiresIn,
       secretTokenInterno
@@ -282,12 +283,13 @@ exports.refreshTokenInternalUser = async (req, res, next) => {
 
     await saveRefreshTokenInterno(newRefreshTokenKey, user, ipAddress);
 
-    delete user.password;
-    delete user.salt;
-
     const token = signToken(
       {
-        user,
+        user: {
+          _id: user._id,
+          userName: user.userName,
+          role: user.role,
+        },
       },
       expiresIn,
       secretTokenInterno
