@@ -52,7 +52,7 @@ router.delete(
   authInternoController.deleteInternalUser
 );
 
-router.post("/login", authInternoController.loginInternalUser);
+router.post("/login", authInternoController.loginInternalUser, authInternoController.sendResponse);
 
 router.post("/refresh-token", authInternoController.refreshTokenInternalUser);
 
