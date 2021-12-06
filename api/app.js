@@ -8,8 +8,18 @@ const authInterno = require("./routes/authInterno");
 const claveUnica = require("./routes/claveUnica");
 
 const app = express();
+
+var corsOptions = {
+  origin: true,
+  methods: ['GET', 'PUT', 'POST', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  // preflightContinue: true,
+  optionsSuccessStatus: 200,
+}
+
 app.use(express.json());
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(cookieParser());
 
 const connection = process.env.MONGO_URI;
