@@ -190,7 +190,7 @@ exports.loginInternalUser = async (req, res, next) => {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "strict",
+      sameSite: "None",
     });
 
     req.response = {
