@@ -52,8 +52,18 @@ router.delete(
   authInternoController.deleteInternalUser
 );
 
-router.post("/login", authInternoController.loginInternalUser, authInternoController.sendResponse);
+router.post(
+  "/login",
+  authInternoController.loginInternalUser,
+  authInternoController.addCookie,
+  authInternoController.sendToken
+);
 
-router.post("/refresh-token", authInternoController.refreshTokenInternalUser);
+router.post(
+  "/refresh-token",
+  authInternoController.refreshTokenInternalUser,
+  authInternoController.addCookie,
+  authInternoController.sendToken
+);
 
 module.exports = router;

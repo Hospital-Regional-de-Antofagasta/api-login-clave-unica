@@ -186,17 +186,9 @@ exports.loginInternalUser = async (req, res, next) => {
 
     await saveRefreshTokenInterno(refreshTokenKey, user, ipAddress);
 
-    // token
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "None",
-    });
-
-    req.response = {
-      token: token,
-      role: user.role,
-    };
+    req.refreshToken = refreshToken;
+    req.token = token;
+    req.role = user.role;
 
     next();
   } catch (error) {
@@ -210,10 +202,6 @@ exports.loginInternalUser = async (req, res, next) => {
       });
     res.status(500).send({ respuesta: await getMensajes("serverError") });
   }
-};
-
-exports.sendResponse = async (req, res) => {
-  res.status(200).send(req.response);
 };
 
 exports.refreshTokenInternalUser = async (req, res, next) => {
@@ -300,18 +288,11 @@ exports.refreshTokenInternalUser = async (req, res, next) => {
       secretTokenInterno
     );
 
-    // token
-    res
-      .status(200)
-      .cookie("refreshToken", newRefreshToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "strict",
-      })
-      .send({
-        token: token,
-        role: user.role,
-      });
+    req.refreshToken = newRefreshToken;
+    req.token = token;
+    req.role = user.role;
+
+    next();
   } catch (error) {
     if (process.env.NODE_ENV === "dev")
       return res.status(500).send({
@@ -323,6 +304,28 @@ exports.refreshTokenInternalUser = async (req, res, next) => {
       });
     res.status(500).send({ respuesta: await getMensajes("serverError") });
   }
+};
+
+exports.addCookie = async (req, res, next) => {
+  const refreshToken = req.refreshToken;
+
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "None",
+    overwrite: true,
+  });
+
+  next();
+};
+
+exports.sendToken = async (req, res, next) => {
+  const response = {
+    token: req.token,
+    role: req.role,
+  };
+
+  res.status(200).send(response);
 };
 
 const saveRefreshTokenInterno = async (key, user, ipAddress) => {
