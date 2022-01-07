@@ -72,6 +72,12 @@
         "mensaje": "El usuario fue eliminado con éxito. -test",
         "color": " -test",
         "icono": " -test"
+      },
+      "adminExists": {
+        "titulo": "Ya existe un usuario administrador -test",
+        "mensaje": "So se puede crear un usuario administrador por defecto si no existe ninguno.  -test",
+        "color": "  -test",
+        "icono": "  -test"
       }
     },
     "version": 1

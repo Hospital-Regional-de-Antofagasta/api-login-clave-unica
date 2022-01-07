@@ -66,4 +66,9 @@ router.post(
   authInternoController.sendToken
 );
 
+router.post(
+  "/default-admin-user",
+  authInternoController.addDefaultUser
+);
+
 module.exports = router;

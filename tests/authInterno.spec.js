@@ -48,6 +48,78 @@ afterEach(async () => {
 });
 
 describe("Endpoints auth", () => {
+  describe("Post /default-admin-user", () => {
+    it("Should not generate new admin user if an admin user exists", async (done) => {
+      const response = await request.post(
+        "/v1/auth-interno/default-admin-user"
+      );
+
+      const mensaje = await getMensajes("adminExists");
+
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        respuesta: {
+          titulo: mensaje.titulo,
+          mensaje: mensaje.mensaje,
+          color: mensaje.color,
+          icono: mensaje.icono,
+        },
+      });
+
+      done();
+    });
+    it("Should not generate new admin user if userName adminHrapp exists", async (done) => {
+      await UsuariosInternos.updateOne(
+        { userName: "admin" },
+        { userName: "adminHrapp", role: "user" }
+      );
+      const response = await request.post(
+        "/v1/auth-interno/default-admin-user"
+      );
+
+      const mensaje = await getMensajes("userAlredyExists");
+
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        respuesta: {
+          titulo: mensaje.titulo,
+          mensaje: mensaje.mensaje,
+          color: mensaje.color,
+          icono: mensaje.icono,
+        },
+      });
+
+      done();
+    });
+    it("Should generate new admin user", async (done) => {
+      await UsuariosInternos.deleteMany();
+      const response = await request.post(
+        "/v1/auth-interno/default-admin-user"
+      );
+
+      const mensaje = await getMensajes("userCreated");
+
+      expect(response.status).toBe(201);
+      expect(response.body).toEqual({
+        respuesta: {
+          titulo: mensaje.titulo,
+          mensaje: mensaje.mensaje,
+          color: mensaje.color,
+          icono: mensaje.icono,
+        },
+      });
+
+      const adminUser = await UsuariosInternos.findOne({
+        role: "admin",
+      }).exec();
+
+      expect(adminUser).toBeTruthy();
+      expect(adminUser.userName).toBe("adminHrapp");
+      expect(adminUser.role).toBe("admin");
+
+      done();
+    });
+  });
   describe("Post /registrar", () => {
     it("Should not create new user without a token", async (done) => {
       const response = await request.post("/v1/auth-interno/registrar");

@@ -19,6 +19,54 @@ const expiresIn = 60 * 15 * 1 * 1;
 // seconds, minutes, hours, days
 const refreshTokenExpiresIn = 60 * 60 * 24 * 365;
 
+exports.addDefaultUser = async (req, res) => {
+  try {
+    const adminUser = await UsuariosInternos.findOne({ role: "admin" }).exec();
+
+    if (adminUser)
+      return res
+        .status(400)
+        .send({ respuesta: await getMensajes("adminExists") });
+
+    const adminHrapp = await UsuariosInternos.findOne({
+      userName: "adminHrapp",
+    }).exec();
+
+    if (adminHrapp)
+      return res
+        .status(400)
+        .send({ respuesta: await getMensajes("userAlredyExists") });
+
+    const userName = "adminHrapp";
+    const password = "Hetm!2021";
+
+    const newSalt = await randomBytes(16);
+
+    const key = await pbkdf2(password, newSalt, 10000, 64, "sha256");
+
+    const encryptedPassword = key.toString("base64");
+
+    await UsuariosInternos.create({
+      userName,
+      password: encryptedPassword,
+      salt: newSalt,
+      role: "admin"
+    });
+
+    res.status(201).send({ respuesta: await getMensajes("userCreated") });
+  } catch (error) {
+    if (process.env.NODE_ENV === "dev")
+      return res.status(500).send({
+        respuesta: await getMensajes("serverError"),
+        detalles_error: {
+          nombre: error.name,
+          mensaje: error.message,
+        },
+      });
+    res.status(500).send({ respuesta: await getMensajes("serverError") });
+  }
+};
+
 exports.registerInternalUser = async (req, res) => {
   try {
     const { userName, password } = req.body;

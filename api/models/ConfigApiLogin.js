@@ -77,6 +77,12 @@ const ConfigApiLogin = mongoose.model(
         color: String,
         icono: String,
       },
+      adminExists: {
+        titulo: String,
+        mensaje: String,
+        color: String,
+        icono: String,
+      },
     },
     version: Number,
   }),
