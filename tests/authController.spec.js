@@ -89,7 +89,7 @@ describe("Function login", () => {
         });
       });
 
-      expect(resultToken.numeroPaciente).toBe(16)
+      expect(resultToken.rut).toBe("10771131-7")
 
       const refreshToken = res.send.mock.calls[0][0].refresh_token;
 

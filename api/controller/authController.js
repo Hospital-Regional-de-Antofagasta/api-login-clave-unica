@@ -34,7 +34,7 @@ exports.loginTest = async (req, res) => {
     const token = signToken(
       {
         _id: paciente._id,
-        numeroPaciente: paciente.numeroPaciente,
+        rut: paciente.rut,
       },
       expiresInTesting,
       secretToken
@@ -106,7 +106,7 @@ exports.login = async (req, res) => {
     const token = signToken(
       {
         _id: paciente._id,
-        numeroPaciente: paciente.numeroPaciente,
+        rut: paciente.rut,
       },
       expiresIn,
       secretToken
@@ -228,7 +228,7 @@ exports.refreshToken = async (req, res) => {
     const token = signToken(
       {
         _id: paciente._id,
-        numeroPaciente: paciente.numeroPaciente,
+        rut: paciente.rut,
       },
       expiresIn,
       secretToken
