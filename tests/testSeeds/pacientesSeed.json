@@ -17,7 +17,6 @@
     "telefonoMovil": "",
     "correoCuerpo": "",
     "correoExtension": "",
-    "fechaFallecimiento": "1900-01-01T00:00:00.000Z",
     "codigosEstablecimientos": ["HRA"],
     "datosContactoActualizados": false
   },
@@ -39,7 +38,6 @@
     "telefonoMovil": "",
     "correoCuerpo": "",
     "correoExtension": "",
-    "fechaFallecimiento": "1900-01-01T00:00:00.000Z",
     "codigosEstablecimientos": ["HRA"],
     "datosContactoActualizados": false
   },
@@ -61,7 +59,6 @@
     "telefonoMovil": " 094924483",
     "correoCuerpo": null,
     "correoExtension": null,
-    "fechaFallecimiento": "1900-01-01T00:00:00.000Z",
     "codigosEstablecimientos": ["HRA"],
     "datosContactoActualizados": true
   }
