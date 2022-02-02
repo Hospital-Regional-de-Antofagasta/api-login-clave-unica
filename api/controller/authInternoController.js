@@ -8,6 +8,8 @@ const {
   randomBytes,
   pbkdf2,
 } = require("../utils/auth");
+const { manejarError } = require("../utils/errorController");
+const { registerAuditLog } = require("../utils/auditLogController");
 
 const secretTokenInterno = process.env.JWT_SECRET_INTERNO;
 
@@ -50,7 +52,7 @@ exports.addDefaultUser = async (req, res) => {
       userName,
       password: encryptedPassword,
       salt: newSalt,
-      role: "admin"
+      role: "admin",
     });
 
     res.status(201).send({ respuesta: await getMensajes("userCreated") });
@@ -77,10 +79,10 @@ exports.registerInternalUser = async (req, res) => {
 
     const encryptedPassword = key.toString("base64");
 
-    const user = await UsuariosInternos.findOne({ userName }).exec();
+    let user = await UsuariosInternos.findOne({ userName }).exec();
 
     if (!user) {
-      await UsuariosInternos.create({
+      user = await UsuariosInternos.create({
         userName,
         password: encryptedPassword,
         salt: newSalt,
@@ -89,17 +91,16 @@ exports.registerInternalUser = async (req, res) => {
       await UsuariosInternos.updateOne({ userName }, { role: "user" }).exec();
     }
 
+    await registerAuditLog(
+      req.user.userName,
+      req.user._id,
+      "/v1/auth-interno/registrar",
+      { userName }
+    );
+
     res.status(201).send({ respuesta: await getMensajes("userCreated") });
   } catch (error) {
-    if (process.env.NODE_ENV === "dev")
-      return res.status(500).send({
-        respuesta: await getMensajes("serverError"),
-        detalles_error: {
-          nombre: error.name,
-          mensaje: error.message,
-        },
-      });
-    res.status(500).send({ respuesta: await getMensajes("serverError") });
+    await manejarError(error, req, res);
   }
 };
 
@@ -126,17 +127,16 @@ exports.changePasswordInternalUser = async (req, res) => {
       }
     );
 
+    await registerAuditLog(
+      req.user.userName,
+      req.user._id,
+      "/v1/auth-interno/cambiar-contrasenia/:userName",
+      { userName }
+    );
+
     res.status(200).send({ respuesta: await getMensajes("passwordChanged") });
   } catch (error) {
-    if (process.env.NODE_ENV === "dev")
-      return res.status(500).send({
-        respuesta: await getMensajes("serverError"),
-        detalles_error: {
-          nombre: error.name,
-          mensaje: error.message,
-        },
-      });
-    res.status(500).send({ respuesta: await getMensajes("serverError") });
+    await manejarError(error, req, res);
   }
 };
 
@@ -163,17 +163,16 @@ exports.deleteInternalUser = async (req, res) => {
 
     await UsuariosInternos.updateOne({ userName }, { role: null });
 
+    await registerAuditLog(
+      req.user.userName,
+      req.user._id,
+      "/v1/auth-interno/eliminar-usuario/:userName",
+      { userName }
+    );
+
     res.status(200).send({ respuesta: await getMensajes("userDeleted") });
   } catch (error) {
-    if (process.env.NODE_ENV === "dev")
-      return res.status(500).send({
-        respuesta: await getMensajes("serverError"),
-        detalles_error: {
-          nombre: error.name,
-          mensaje: error.message,
-        },
-      });
-    res.status(500).send({ respuesta: await getMensajes("serverError") });
+    await manejarError(error, req, res);
   }
 };
 
@@ -240,15 +239,7 @@ exports.loginInternalUser = async (req, res, next) => {
 
     next();
   } catch (error) {
-    if (process.env.NODE_ENV === "dev")
-      return res.status(500).send({
-        respuesta: await getMensajes("serverError"),
-        detalles_error: {
-          nombre: error.name,
-          mensaje: error.message,
-        },
-      });
-    res.status(500).send({ respuesta: await getMensajes("serverError") });
+    await manejarError(error, req, res);
   }
 };
 
@@ -342,15 +333,7 @@ exports.refreshTokenInternalUser = async (req, res, next) => {
 
     next();
   } catch (error) {
-    if (process.env.NODE_ENV === "dev")
-      return res.status(500).send({
-        respuesta: await getMensajes("serverError"),
-        detalles_error: {
-          nombre: error.name,
-          mensaje: error.message,
-        },
-      });
-    res.status(500).send({ respuesta: await getMensajes("serverError") });
+    await manejarError(error, req, res);
   }
 };
 

@@ -79,6 +79,12 @@ const mensajesPorDefecto = {
     color: "",
     icono: "",
   },
+  badRequest: {
+    titulo: "Datos inválidos",
+    mensaje: "Los datos enviados son inválidos.",
+    color: "",
+    icono: "",
+  },
 };
 
 exports.getMensajes = async (tipo) => {
