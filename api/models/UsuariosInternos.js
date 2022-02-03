@@ -5,10 +5,10 @@ const UsuariosInternos = mongoose.model(
   "usuarios_internos",
   new Schema(
     {
-      userName: String,
+      userName: { type: String, required: true, unique: true },
       password: String,
       salt: Buffer,
-      role: { type: String, default: 'user' },
+      role: { type: String, default: "user" },
     },
     { timestamps: true }
   )

@@ -7,6 +7,7 @@ const ConfigApiLogin = require("../api/models/ConfigApiLogin");
 const configSeed = require("./testSeeds/configSeed.json");
 const UsuariosInternos = require("../api/models/UsuariosInternos");
 const RefreshTokenInterno = require("../api/models/RefreshTokenInterno");
+const AuditLogging = require("../api/models/AuditLogging.js");
 const usuariosInternosSeed = require("./testSeeds/usuariosInternosSeed.json");
 const refreshTokensInternosSeed = require("./testSeeds/refreshTokensInternosSeed.json");
 
@@ -18,16 +19,30 @@ const secretRefreshTokenInterno = process.env.JWT_SECRET_REFRESH_TOKEN_INTERNO;
 
 const userId = "61832a43c8a4d50009607cab";
 
+const user = {
+  _id: "61832a43c8a4d50009607cab",
+  userName: "admin",
+  role: "admin",
+};
+
 const tokenInterno = jwt.sign(
   {
-    user: {
-      _id: "61832a43c8a4d50009607cab",
-      userName: "admin",
-      role: "admin",
-    },
+    user,
   },
   secretoInterno
 );
+
+const expectAuditLog = async (action) => {
+  const registro = await AuditLogging.findOne({
+    userName: user.userName,
+    userId: user._id,
+    action,
+  }).exec();
+
+  expect(registro).toBeTruthy();
+  expect(registro.affectedData.userName).toBeTruthy();
+  expect(registro.createdAt).toBeTruthy();
+}
 
 beforeEach(async () => {
   await mongoose.disconnect();
@@ -44,10 +59,83 @@ afterEach(async () => {
   await UsuariosInternos.deleteMany();
   await RefreshTokenInterno.deleteMany();
   await ConfigApiLogin.deleteMany();
+  await AuditLogging.deleteMany();
   await mongoose.connection.close();
 });
 
 describe("Endpoints auth", () => {
+  describe("Post /default-admin-user", () => {
+    it("Should not generate new admin user if an admin user exists", async (done) => {
+      const response = await request.post(
+        "/v1/auth-interno/default-admin-user"
+      );
+
+      const mensaje = await getMensajes("adminExists");
+
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        respuesta: {
+          titulo: mensaje.titulo,
+          mensaje: mensaje.mensaje,
+          color: mensaje.color,
+          icono: mensaje.icono,
+        },
+      });
+
+      done();
+    });
+    it("Should not generate new admin user if userName adminHrapp exists", async (done) => {
+      await UsuariosInternos.updateOne(
+        { userName: "admin" },
+        { userName: "adminHrapp", role: "user" }
+      );
+      const response = await request.post(
+        "/v1/auth-interno/default-admin-user"
+      );
+
+      const mensaje = await getMensajes("userAlredyExists");
+
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        respuesta: {
+          titulo: mensaje.titulo,
+          mensaje: mensaje.mensaje,
+          color: mensaje.color,
+          icono: mensaje.icono,
+        },
+      });
+
+      done();
+    });
+    it("Should generate new admin user", async (done) => {
+      await UsuariosInternos.deleteMany();
+      const response = await request.post(
+        "/v1/auth-interno/default-admin-user"
+      );
+
+      const mensaje = await getMensajes("userCreated");
+
+      expect(response.status).toBe(201);
+      expect(response.body).toEqual({
+        respuesta: {
+          titulo: mensaje.titulo,
+          mensaje: mensaje.mensaje,
+          color: mensaje.color,
+          icono: mensaje.icono,
+        },
+      });
+
+      const adminUser = await UsuariosInternos.findOne({
+        role: "admin",
+      }).exec();
+
+      expect(adminUser).toBeTruthy();
+      expect(adminUser.userName).toBe("adminHrapp");
+      expect(adminUser.role).toBe("admin");
+
+      done();
+    });
+  });
   describe("Post /registrar", () => {
     it("Should not create new user without a token", async (done) => {
       const response = await request.post("/v1/auth-interno/registrar");
@@ -215,10 +303,6 @@ describe("Endpoints auth", () => {
         .set("Authorization", tokenInterno)
         .send(postData);
 
-      const usuario = await UsuariosInternos.findOne({
-        userName: "usuario5",
-      }).exec();
-
       const mensaje = await getMensajes("userCreated");
 
       expect(response.status).toBe(201);
@@ -231,7 +315,13 @@ describe("Endpoints auth", () => {
         },
       });
 
+      const usuario = await UsuariosInternos.findOne({
+        userName: "usuario5",
+      }).exec();
+
       expect(usuario).toBeTruthy();
+
+      await expectAuditLog("/v1/auth-interno/registrar");
 
       done();
     });
@@ -246,10 +336,6 @@ describe("Endpoints auth", () => {
         .set("Authorization", tokenInterno)
         .send(postData);
 
-      const usuario = await UsuariosInternos.findOne({
-        userName: "usuario6",
-      }).exec();
-
       const mensaje = await getMensajes("userCreated");
 
       expect(response.status).toBe(201);
@@ -262,7 +348,13 @@ describe("Endpoints auth", () => {
         },
       });
 
+      const usuario = await UsuariosInternos.findOne({
+        userName: "usuario6",
+      }).exec();
+
       expect(usuario).toBeTruthy();
+
+      await expectAuditLog("/v1/auth-interno/registrar");
 
       done();
     });
@@ -418,10 +510,6 @@ describe("Endpoints auth", () => {
 
       const mensaje = await getMensajes("passwordChanged");
 
-      const usuarioDespues = await UsuariosInternos.findOne({
-        userName: "usuario",
-      }).exec();
-
       expect(response.status).toBe(200);
       expect(response.body).toEqual({
         respuesta: {
@@ -432,13 +520,19 @@ describe("Endpoints auth", () => {
         },
       });
 
+      const usuarioDespues = await UsuariosInternos.findOne({
+        userName: "usuario",
+      }).exec();
+
       expect(usuarioAntes.password).not.toBe(usuarioDespues.password);
+
+      await expectAuditLog("/v1/auth-interno/cambiar-contrasenia/:userName");
 
       done();
     });
   });
   describe("Delete /eliminar-usuario/:userName", () => {
-    it("Should not user without a token", async (done) => {
+    it("Should not delete user without a token", async (done) => {
       const response = await request.delete(
         "/v1/auth-interno/eliminar-usuario/usuario"
       );
@@ -483,15 +577,6 @@ describe("Endpoints auth", () => {
 
       const mensaje = await getMensajes("userDeleted");
 
-      const usuario = await UsuariosInternos.findOne({
-        userName: "admin",
-      }).exec();
-
-      const refreshToken = await RefreshTokenInterno.findOne({
-        user_id: usuario._id,
-        revoked: null,
-      }).exec();
-
       expect(response.status).toBe(200);
       expect(response.body).toEqual({
         respuesta: {
@@ -502,8 +587,20 @@ describe("Endpoints auth", () => {
         },
       });
 
+      const usuario = await UsuariosInternos.findOne({
+        userName: "admin",
+      }).exec();
+
       expect(usuario.role).toBeFalsy();
+
+      const refreshToken = await RefreshTokenInterno.findOne({
+        user_id: usuario._id,
+        revoked: null,
+      }).exec();
+
       expect(refreshToken).toBeFalsy();
+
+      await expectAuditLog("/v1/auth-interno/eliminar-usuario/:userName");
 
       done();
     });

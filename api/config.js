@@ -73,6 +73,18 @@ const mensajesPorDefecto = {
     color: "",
     icono: "",
   },
+  adminExists: {
+    titulo: "Ya existe un usuario administrador",
+    mensaje: "So se puede crear un usuario administrador por defecto si no existe ninguno.",
+    color: "",
+    icono: "",
+  },
+  badRequest: {
+    titulo: "Datos inválidos",
+    mensaje: "Los datos enviados son inválidos.",
+    color: "",
+    icono: "",
+  },
 };
 
 exports.getMensajes = async (tipo) => {

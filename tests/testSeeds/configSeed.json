@@ -72,6 +72,18 @@
         "mensaje": "El usuario fue eliminado con éxito. -test",
         "color": " -test",
         "icono": " -test"
+      },
+      "adminExists": {
+        "titulo": "Ya existe un usuario administrador -test",
+        "mensaje": "So se puede crear un usuario administrador por defecto si no existe ninguno.  -test",
+        "color": "  -test",
+        "icono": "  -test"
+      },
+      "badRequest": {
+        "titulo": "Datos inválidos -test",
+        "mensaje": "Los datos enviados son inválidos. -test",
+        "color": " -test",
+        "icono": " -test"
       }
     },
     "version": 1

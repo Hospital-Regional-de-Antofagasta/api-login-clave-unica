@@ -8,6 +8,8 @@ const {
   randomBytes,
   pbkdf2,
 } = require("../utils/auth");
+const { manejarError } = require("../utils/errorController");
+const { registerAuditLog } = require("../utils/auditLogController");
 
 const secretTokenInterno = process.env.JWT_SECRET_INTERNO;
 
@@ -19,9 +21,26 @@ const expiresIn = 60 * 15 * 1 * 1;
 // seconds, minutes, hours, days
 const refreshTokenExpiresIn = 60 * 60 * 24 * 365;
 
-exports.registerInternalUser = async (req, res) => {
+exports.addDefaultUser = async (req, res) => {
   try {
-    const { userName, password } = req.body;
+    const adminUser = await UsuariosInternos.findOne({ role: "admin" }).exec();
+
+    if (adminUser)
+      return res
+        .status(400)
+        .send({ respuesta: await getMensajes("adminExists") });
+
+    const adminHrapp = await UsuariosInternos.findOne({
+      userName: "adminHrapp",
+    }).exec();
+
+    if (adminHrapp)
+      return res
+        .status(400)
+        .send({ respuesta: await getMensajes("userAlredyExists") });
+
+    const userName = "adminHrapp";
+    const password = "Hetm!2021";
 
     const newSalt = await randomBytes(16);
 
@@ -29,17 +48,12 @@ exports.registerInternalUser = async (req, res) => {
 
     const encryptedPassword = key.toString("base64");
 
-    const user = await UsuariosInternos.findOne({ userName }).exec();
-
-    if (!user) {
-      await UsuariosInternos.create({
-        userName,
-        password: encryptedPassword,
-        salt: newSalt,
-      });
-    } else {
-      await UsuariosInternos.updateOne({ userName }, { role: "user" }).exec();
-    }
+    await UsuariosInternos.create({
+      userName,
+      password: encryptedPassword,
+      salt: newSalt,
+      role: "admin",
+    });
 
     res.status(201).send({ respuesta: await getMensajes("userCreated") });
   } catch (error) {
@@ -52,6 +66,41 @@ exports.registerInternalUser = async (req, res) => {
         },
       });
     res.status(500).send({ respuesta: await getMensajes("serverError") });
+  }
+};
+
+exports.registerInternalUser = async (req, res) => {
+  try {
+    const { userName, password } = req.body;
+
+    const newSalt = await randomBytes(16);
+
+    const key = await pbkdf2(password, newSalt, 10000, 64, "sha256");
+
+    const encryptedPassword = key.toString("base64");
+
+    let user = await UsuariosInternos.findOne({ userName }).exec();
+
+    if (!user) {
+      user = await UsuariosInternos.create({
+        userName,
+        password: encryptedPassword,
+        salt: newSalt,
+      });
+    } else {
+      await UsuariosInternos.updateOne({ userName }, { role: "user" }).exec();
+    }
+
+    await registerAuditLog(
+      req.user.userName,
+      req.user._id,
+      "/v1/auth-interno/registrar",
+      { userName }
+    );
+
+    res.status(201).send({ respuesta: await getMensajes("userCreated") });
+  } catch (error) {
+    await manejarError(error, req, res);
   }
 };
 
@@ -78,17 +127,16 @@ exports.changePasswordInternalUser = async (req, res) => {
       }
     );
 
+    await registerAuditLog(
+      req.user.userName,
+      req.user._id,
+      "/v1/auth-interno/cambiar-contrasenia/:userName",
+      { userName }
+    );
+
     res.status(200).send({ respuesta: await getMensajes("passwordChanged") });
   } catch (error) {
-    if (process.env.NODE_ENV === "dev")
-      return res.status(500).send({
-        respuesta: await getMensajes("serverError"),
-        detalles_error: {
-          nombre: error.name,
-          mensaje: error.message,
-        },
-      });
-    res.status(500).send({ respuesta: await getMensajes("serverError") });
+    await manejarError(error, req, res);
   }
 };
 
@@ -115,17 +163,16 @@ exports.deleteInternalUser = async (req, res) => {
 
     await UsuariosInternos.updateOne({ userName }, { role: null });
 
+    await registerAuditLog(
+      req.user.userName,
+      req.user._id,
+      "/v1/auth-interno/eliminar-usuario/:userName",
+      { userName }
+    );
+
     res.status(200).send({ respuesta: await getMensajes("userDeleted") });
   } catch (error) {
-    if (process.env.NODE_ENV === "dev")
-      return res.status(500).send({
-        respuesta: await getMensajes("serverError"),
-        detalles_error: {
-          nombre: error.name,
-          mensaje: error.message,
-        },
-      });
-    res.status(500).send({ respuesta: await getMensajes("serverError") });
+    await manejarError(error, req, res);
   }
 };
 
@@ -192,15 +239,7 @@ exports.loginInternalUser = async (req, res, next) => {
 
     next();
   } catch (error) {
-    if (process.env.NODE_ENV === "dev")
-      return res.status(500).send({
-        respuesta: await getMensajes("serverError"),
-        detalles_error: {
-          nombre: error.name,
-          mensaje: error.message,
-        },
-      });
-    res.status(500).send({ respuesta: await getMensajes("serverError") });
+    await manejarError(error, req, res);
   }
 };
 
@@ -294,15 +333,7 @@ exports.refreshTokenInternalUser = async (req, res, next) => {
 
     next();
   } catch (error) {
-    if (process.env.NODE_ENV === "dev")
-      return res.status(500).send({
-        respuesta: await getMensajes("serverError"),
-        detalles_error: {
-          nombre: error.name,
-          mensaje: error.message,
-        },
-      });
-    res.status(500).send({ respuesta: await getMensajes("serverError") });
+    await manejarError(error, req, res);
   }
 };
 
