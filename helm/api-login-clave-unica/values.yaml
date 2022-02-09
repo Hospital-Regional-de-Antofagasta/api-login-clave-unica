@@ -24,6 +24,7 @@ secrets:
   cuJwtKey: ""
   iJwtKey: ""
   iJwtKeyRefresh: ""
+  apiUrl: ""
 
 enviroment: prod
 

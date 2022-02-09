@@ -29,6 +29,7 @@ jobs:
           JWT_SECRET_CLAVE_UNICA: "TEST"
           JWT_SECRET_INTERNO: "TEST"
           JWT_SECRET_REFRESH_TOKEN_INTERNO: "TEST"
+          API_URL: "http://localhost:3000"
         run: |
           chmod +x ./gradlew
           ./gradlew build
