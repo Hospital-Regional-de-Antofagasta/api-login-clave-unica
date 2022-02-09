@@ -1,8 +1,9 @@
 const { v4: uuidv4 } = require("uuid");
-const Pacientes = require("../models/Pacientes");
 const RefreshToken = require("../models/RefreshToken");
 const { getMensajes } = require("../config");
 const { signToken, decodeToken } = require("../utils/auth");
+const { getPacienteByRut } = require("../utils/pacientesController")
+const { manejarError } = require("../utils/errorController");
 
 const secretToken = process.env.JWT_SECRET;
 
@@ -34,7 +35,7 @@ exports.loginTest = async (req, res) => {
     const token = signToken(
       {
         _id: paciente._id,
-        rut: paciente.rut,
+        rut: rut,
       },
       expiresInTesting,
       secretToken
@@ -43,7 +44,7 @@ exports.loginTest = async (req, res) => {
     const refreshTokenKey = uuidv4();
 
     const oldRefreshToken = await RefreshToken.findOne({
-      paciente: paciente._id,
+      rutPaciente: rut,
       revoked: null,
     }).exec();
 
@@ -59,7 +60,7 @@ exports.loginTest = async (req, res) => {
       refreshTokenExpiresIn,
       secretRefreshToken
     );
-    await saveRefreshToken(refreshTokenKey, paciente, ipAddress);
+    await saveRefreshToken(refreshTokenKey, rut, ipAddress);
 
     const nombrePaciente = paciente.nombreSocial
       ? [
@@ -77,15 +78,7 @@ exports.loginTest = async (req, res) => {
       nombre_completo: nombrePaciente,
     });
   } catch (error) {
-    if (process.env.NODE_ENV === "dev")
-      return res.status(500).send({
-        respuesta: await getMensajes("serverError"),
-        detalles_error: {
-          nombre: error.name,
-          mensaje: error.message,
-        },
-      });
-    res.status(500).send({ respuesta: await getMensajes("serverError") });
+    await manejarError(error, req, res);
   }
 };
 
@@ -106,7 +99,7 @@ exports.login = async (req, res) => {
     const token = signToken(
       {
         _id: paciente._id,
-        rut: paciente.rut,
+        rut,
       },
       expiresIn,
       secretToken
@@ -115,7 +108,7 @@ exports.login = async (req, res) => {
     const refreshTokenKey = uuidv4();
 
     const oldRefreshToken = await RefreshToken.findOne({
-      paciente: paciente._id,
+      rutPaciente: rut,
       revoked: null,
     }).exec();
 
@@ -131,7 +124,7 @@ exports.login = async (req, res) => {
       refreshTokenExpiresIn,
       secretRefreshToken
     );
-    await saveRefreshToken(refreshTokenKey, paciente, ipAddress);
+    await saveRefreshToken(refreshTokenKey, rut, ipAddress);
 
     const nombrePaciente = paciente.nombreSocial
       ? [
@@ -149,15 +142,7 @@ exports.login = async (req, res) => {
       nombre_completo: nombrePaciente,
     });
   } catch (error) {
-    if (process.env.NODE_ENV === "dev")
-      return res.status(500).send({
-        respuesta: await getMensajes("serverError"),
-        detalles_error: {
-          nombre: error.name,
-          mensaje: error.message,
-        },
-      });
-    res.status(500).send({ respuesta: await getMensajes("serverError") });
+    await manejarError(error, req, res);
   }
 };
 
@@ -193,9 +178,9 @@ exports.refreshToken = async (req, res) => {
         respuesta: await getMensajes("unauthorizedRefresh"),
       });
 
-    const { paciente_id } = oldRefreshToken;
+    const { rutPaciente } = oldRefreshToken;
 
-    const paciente = await Pacientes.findById(paciente_id).exec();
+    const paciente = await getPacienteByRut(rutPaciente);
 
     if (!paciente)
       return res
@@ -223,12 +208,12 @@ exports.refreshToken = async (req, res) => {
       secretRefreshToken
     );
 
-    await saveRefreshToken(newRefreshTokenKey, paciente, ipAddress);
+    await saveRefreshToken(newRefreshTokenKey, rutPaciente, ipAddress);
 
     const token = signToken(
       {
         _id: paciente._id,
-        rut: paciente.rut,
+        rut: rutPaciente,
       },
       expiresIn,
       secretToken
@@ -241,21 +226,14 @@ exports.refreshToken = async (req, res) => {
       refresh_token: newRefreshToken,
     });
   } catch (error) {
-    if (process.env.NODE_ENV === "dev")
-      return res.status(500).send({
-        respuesta: await getMensajes("serverError"),
-        detalles_error: {
-          nombre: error.name,
-          mensaje: error.message,
-        },
-      });
-    res.status(500).send({ respuesta: await getMensajes("serverError") });
+    await manejarError(error, req, res);
   }
 };
 
-const saveRefreshToken = async (key, paciente, ipAddress) => {
+const saveRefreshToken = async (key, rutPaciente, ipAddress) => {
   const refreshToken = {
-    paciente_id: paciente._id,
+    // paciente_id: paciente._id,
+    rutPaciente,
     key: key,
     createdByIp: ipAddress,
   };
@@ -264,11 +242,11 @@ const saveRefreshToken = async (key, paciente, ipAddress) => {
 };
 
 const validarPaciente = async (rut) => {
-  let paciente = await Pacientes.findOne({ rut: rut }).exec();
+  let paciente = await getPacienteByRut(rut);
   if (!paciente) {
     // los ruts tienen un 0 adelante a veces
     rut = `0${rut}`;
-    paciente = await Pacientes.findOne({ rut: rut }).exec();
+    paciente = await getPacienteByRut(rut);
   }
   return paciente;
 };

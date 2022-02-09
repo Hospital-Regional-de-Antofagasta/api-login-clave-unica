@@ -1,6 +1,7 @@
 const { getMensajes } = require("../config");
 
 exports.manejarError = async (error, req, res) => {
+  console.log({name: error.name, message: error.message})
   if (error.name === "ValidationError") {
     let errors = {};
     for (let prop in error.errors) {

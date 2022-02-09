@@ -2,9 +2,7 @@ const supertest = require("supertest");
 const app = require("../api/app");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
-const Pacientes = require("../api/models/Pacientes");
 const RefreshToken = require("../api/models/RefreshToken");
-const pacientesSeed = require("./testSeeds/pacientesSeed.json");
 const refreshTokensSeed = require("./testSeeds/refreshTokensSeed.json");
 const { getMensajes } = require("../api/config");
 const ConfigApiLogin = require("../api/models/ConfigApiLogin");
@@ -20,13 +18,11 @@ beforeEach(async () => {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
-  await Pacientes.create(pacientesSeed);
   await RefreshToken.create(refreshTokensSeed);
   await ConfigApiLogin.create(configSeed);
 });
 
 afterEach(async () => {
-  await Pacientes.deleteMany();
   await RefreshToken.deleteMany();
   await ConfigApiLogin.deleteMany();
   await mongoose.connection.close();

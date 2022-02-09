@@ -2,8 +2,6 @@ const app = require("../api/app");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const authController = require("../api/controller/authController");
-const Pacientes = require("../api/models/Pacientes");
-const pacientesSeed = require("./testSeeds/pacientesSeed.json");
 const { getMensajes } = require("../api/config");
 const ConfigApiLogin = require("../api/models/ConfigApiLogin");
 const configSeed = require("./testSeeds/configSeed.json");
@@ -18,12 +16,10 @@ beforeEach(async () => {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
-  await Pacientes.create(pacientesSeed);
   await ConfigApiLogin.create(configSeed);
 });
 
 afterEach(async () => {
-  await Pacientes.deleteMany();
   await ConfigApiLogin.deleteMany();
   await mongoose.connection.close();
 });
@@ -40,27 +36,27 @@ const pacienteIngresado = {
 
 describe("Function login", () => {
   describe("Generate token for user", () => {
-    it("Should not generate token for paciente that does not exist", async (done) => {
-      const req = {
-        body: pacienteNoIngresado,
-        headers: [],
-        connection: { remoteAddress: "123" },
-      };
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        send: jest.fn(),
-      };
+    // it("Should not generate token for paciente that does not exist", async (done) => {
+    //   const req = {
+    //     body: pacienteNoIngresado,
+    //     headers: [],
+    //     connection: { remoteAddress: "123" },
+    //   };
+    //   const res = {
+    //     status: jest.fn().mockReturnThis(),
+    //     send: jest.fn(),
+    //   };
 
-      await authController.login(req, res);
+    //   await authController.login(req, res);
 
-      expect(res.status.mock.calls).toEqual([[401]]);
+    //   expect(res.status.mock.calls).toEqual([[401]]);
 
-      expect(res.send.mock.calls).toEqual([
-        [{ respuesta: await getMensajes("unauthorized") }],
-      ]);
+    //   expect(res.send.mock.calls).toEqual([
+    //     [{ respuesta: await getMensajes("unauthorized") }],
+    //   ]);
 
-      done();
-    });
+    //   done();
+    // });
     it("Should generate token for paciente that exists", async (done) => {
       const req = {
         body: pacienteIngresado,
@@ -104,27 +100,26 @@ describe("Function login", () => {
 
       done();
     });
-    it("Should not generate token with empty db", async (done) => {
-      await Pacientes.deleteMany();
-      const req = {
-        body: pacienteIngresado,
-        headers: [],
-        connection: { remoteAddress: "123" },
-      };
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        send: jest.fn(),
-      };
+    // it("Should not generate token with empty db", async (done) => {
+    //   const req = {
+    //     body: pacienteIngresado,
+    //     headers: [],
+    //     connection: { remoteAddress: "123" },
+    //   };
+    //   const res = {
+    //     status: jest.fn().mockReturnThis(),
+    //     send: jest.fn(),
+    //   };
 
-      await authController.login(req, res);
+    //   await authController.login(req, res);
 
-      expect(res.status.mock.calls).toEqual([[401]]);
+    //   expect(res.status.mock.calls).toEqual([[401]]);
 
-      expect(res.send.mock.calls).toEqual([
-        [{ respuesta: await getMensajes("unauthorized") }],
-      ]);
+    //   expect(res.send.mock.calls).toEqual([
+    //     [{ respuesta: await getMensajes("unauthorized") }],
+    //   ]);
 
-      done();
-    });
+    //   done();
+    // });
   });
 });
