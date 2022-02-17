@@ -36,5 +36,5 @@ exports.getPacienteByRut = async (rutPaciente) => {
 
   if (!respuesta?.data) return respuesta;
 
-  return response.data;
+  return respuesta.data;
 };
