@@ -2,8 +2,8 @@ const { v4: uuidv4 } = require("uuid");
 const RefreshToken = require("../models/RefreshToken");
 const { getMensajes } = require("../config");
 const { signToken, decodeToken } = require("../utils/auth");
-const { getPacienteByRut } = require("../utils/pacientesController")
-const { manejarError } = require("../utils/errorController");
+const { getPacienteByRut } = require("./pacientesController");
+const { handleError } = require("../utils/errorHandler");
 
 const secretToken = process.env.JWT_SECRET;
 
@@ -78,7 +78,7 @@ exports.loginTest = async (req, res) => {
       nombre_completo: nombrePaciente,
     });
   } catch (error) {
-    await manejarError(error, req, res);
+    await handleError(error, req, res);
   }
 };
 
@@ -142,7 +142,7 @@ exports.login = async (req, res) => {
       nombre_completo: nombrePaciente,
     });
   } catch (error) {
-    await manejarError(error, req, res);
+    await handleError(error, req, res);
   }
 };
 
@@ -226,7 +226,7 @@ exports.refreshToken = async (req, res) => {
       refresh_token: newRefreshToken,
     });
   } catch (error) {
-    await manejarError(error, req, res);
+    await handleError(error, req, res);
   }
 };
 

@@ -8,7 +8,7 @@ const {
   randomBytes,
   pbkdf2,
 } = require("../utils/auth");
-const { manejarError } = require("../utils/errorController");
+const { handleError } = require("../utils/errorHandler");
 const { registerAuditLog } = require("../utils/auditLogController");
 
 const secretTokenInterno = process.env.JWT_SECRET_INTERNO;
@@ -100,7 +100,7 @@ exports.registerInternalUser = async (req, res) => {
 
     res.status(201).send({ respuesta: await getMensajes("userCreated") });
   } catch (error) {
-    await manejarError(error, req, res);
+    await handleError(error, req, res);
   }
 };
 
@@ -136,7 +136,7 @@ exports.changePasswordInternalUser = async (req, res) => {
 
     res.status(200).send({ respuesta: await getMensajes("passwordChanged") });
   } catch (error) {
-    await manejarError(error, req, res);
+    await handleError(error, req, res);
   }
 };
 
@@ -172,7 +172,7 @@ exports.deleteInternalUser = async (req, res) => {
 
     res.status(200).send({ respuesta: await getMensajes("userDeleted") });
   } catch (error) {
-    await manejarError(error, req, res);
+    await handleError(error, req, res);
   }
 };
 
@@ -239,7 +239,7 @@ exports.loginInternalUser = async (req, res, next) => {
 
     next();
   } catch (error) {
-    await manejarError(error, req, res);
+    await handleError(error, req, res);
   }
 };
 
@@ -333,7 +333,7 @@ exports.refreshTokenInternalUser = async (req, res, next) => {
 
     next();
   } catch (error) {
-    await manejarError(error, req, res);
+    await handleError(error, req, res);
   }
 };
 

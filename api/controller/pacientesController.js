@@ -1,5 +1,5 @@
-const axios = require("axios");
 const { signToken } = require("../utils/auth");
+const { httpRequest } = require("../utils/httpRequests");
 const fakeGetPacientesById = require("../../tests/apiResponses/getPacienteById.json");
 const fakeGetPacientesByRut = require("../../tests/apiResponses/getPacienteByRut.json");
 
@@ -26,10 +26,15 @@ exports.getPacienteByRut = async (rutPaciente) => {
     return fakeGetPacientesByRut;
   }
 
-  const response = await axios.get(
+  const respuesta = await httpRequest(
+    "GET",
     `${urlPacientes}/v1/pacientes/informacion?filter=rut`,
-    config
+    null,
+    config,
+    10
   );
+
+  if (!respuesta?.data) return respuesta;
 
   return response.data;
 };
