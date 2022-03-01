@@ -15,11 +15,11 @@
         API_CLUSTER: ${{ secrets.GCP_CLUSTER_QA }}
         API_KEY: ${{ secrets.API_KEY_QA }}
         MONGO_IP: ${{ secrets.MONGO_IP_QA }}
-        JWT_REFRESH_KEY: ${{ secrets.JWT_REFRESH_KEY }}
+        JWT_REFRESH_KEY: ${{ secrets.JWT_REFRESH_KEY_QA }}
         CU_CLIENT_KEY: ${{ secrets.CU_CLIENT_KEY_QA }}
         CU_SECRET_KEY: ${{ secrets.CU_SECRET_KEY_QA }}
         CU_REDIRECT_URI: ${{ secrets.CU_REDIRECT_URI_QA }}
-        CU_JWT_KEY: ${{ secrets.CU_JWT_KEY }}
+        CU_JWT_KEY: ${{ secrets.CU_JWT_KEY_QA }}
         NODE_ENV: "dev"
         I_JWT_KEY: ${{ secrets.I_JWT_KEY_QA }}
         I_JWT_KEY_REFRESH: ${{ secrets.I_JWT_KEY_REFRESH_QA }}
