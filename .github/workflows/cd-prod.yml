@@ -12,7 +12,7 @@
         KEY: ${{ secrets.GCP_KEY }}
         API_ZONE: ${{ secrets.GCP_ZONE_PROD }}
         API_CLUSTER: ${{ secrets.GCP_CLUSTER_PROD }}
-        API_KEY: ${{ secrets.API_KEY }}
+        API_KEY: ${{ secrets.API_KEY_PROD }}
         MONGO_IP: ${{ secrets.MONGO_IP_PROD }}
         JWT_REFRESH_KEY: ${{ secrets.JWT_REFRESH_KEY }}
         CU_CLIENT_KEY: ${{ secrets.CU_CLIENT_KEY_PROD }}
