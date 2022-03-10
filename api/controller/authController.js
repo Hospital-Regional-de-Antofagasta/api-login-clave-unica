@@ -27,6 +27,8 @@ exports.loginTest = async (req, res) => {
 
     const paciente = await validarPaciente(rut);
 
+    console.log(paciente)
+
     if (!paciente) {
       if (process.env.NODE_ENV === "dev")
         return res.status(401).send({
