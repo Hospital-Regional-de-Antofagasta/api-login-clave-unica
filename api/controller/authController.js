@@ -16,7 +16,6 @@ const expiresIn = 60 * 15 * 1 * 1;
 const refreshTokenExpiresIn = 60 * 60 * 24 * 365;
 
 exports.loginTest = async (req, res) => {
-  console.log("loginTest");
   try {
     const rut = req.query.rut ? req.query.rut : "88888888-8";
     const expiresInTesting = req.query.tiempoToken
@@ -28,12 +27,10 @@ exports.loginTest = async (req, res) => {
 
     const paciente = await validarPaciente(rut);
 
-    console.log("paciente", paciente);
-
-    if (!paciente?._id)
+    if (!paciente)
       return res.status(401).send({
         respuesta: await getMensajes("unauthorized"),
-        detalles: `${paciente}`,
+        detalles: `${paciente.name} - ${paciente.message}`,
       });
 
     const token = signToken(
