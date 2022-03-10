@@ -16,6 +16,7 @@ const expiresIn = 60 * 15 * 1 * 1;
 const refreshTokenExpiresIn = 60 * 60 * 24 * 365;
 
 exports.loginTest = async (req, res) => {
+  console.log("loginTest");
   try {
     const rut = req.query.rut ? req.query.rut : "88888888-8";
     const expiresInTesting = req.query.tiempoToken
@@ -27,18 +28,13 @@ exports.loginTest = async (req, res) => {
 
     const paciente = await validarPaciente(rut);
 
-    console.log("paciente", paciente)
+    console.log("paciente", paciente);
 
-    if (!paciente?._id) {
-      if (process.env.NODE_ENV === "dev")
-        return res.status(401).send({
-          respuesta: await getMensajes("unauthorized"),
-          detalles: `${paciente}`,
-        });
+    if (!paciente?._id)
       return res.status(401).send({
         respuesta: await getMensajes("unauthorized"),
+        detalles: `${paciente}`,
       });
-    }
 
     const token = signToken(
       {
@@ -99,16 +95,10 @@ exports.login = async (req, res) => {
 
     const paciente = await validarPaciente(rut);
 
-    if (!paciente?._id) {
-      if (process.env.NODE_ENV === "dev")
-        return res.status(401).send({
-          respuesta: await getMensajes("unauthorized"),
-          detalles: `${paciente}`,
-        });
+    if (!paciente)
       return res.status(401).send({
         respuesta: await getMensajes("unauthorized"),
       });
-    }
 
     const token = signToken(
       {
@@ -196,16 +186,10 @@ exports.refreshToken = async (req, res) => {
 
     const paciente = await getPacienteByRut(rutPaciente);
 
-    if (!paciente?._id) {
-      if (process.env.NODE_ENV === "dev")
-        return res.status(401).send({
-          respuesta: await getMensajes("unauthorized"),
-          detalles: `${paciente}`,
-        });
+    if (!paciente)
       return res.status(401).send({
         respuesta: await getMensajes("unauthorized"),
       });
-    }
 
     if (oldRefreshToken.revoked)
       return res.status(401).send({
@@ -263,7 +247,7 @@ const saveRefreshToken = async (key, rutPaciente, ipAddress) => {
 
 const validarPaciente = async (rut) => {
   let paciente = await getPacienteByRut(rut);
-  if (!paciente?._id) {
+  if (!paciente) {
     // los ruts tienen un 0 adelante a veces
     rut = `0${rut}`;
     paciente = await getPacienteByRut(rut);
