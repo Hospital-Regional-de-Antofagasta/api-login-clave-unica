@@ -57,49 +57,49 @@ describe("Function login", () => {
 
     //   done();
     // });
-    it("Should generate token for paciente that exists", async (done) => {
-      const req = {
-        body: pacienteIngresado,
-        headers: [],
-        connection: { remoteAddress: "123" },
-      };
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        send: jest.fn(),
-      };
+    // it("Should generate token for paciente that exists", async (done) => {
+    //   const req = {
+    //     body: pacienteIngresado,
+    //     headers: [],
+    //     connection: { remoteAddress: "123" },
+    //   };
+    //   const res = {
+    //     status: jest.fn().mockReturnThis(),
+    //     send: jest.fn(),
+    //   };
 
-      await authController.login(req, res);
+    //   await authController.login(req, res);
 
-      expect(res.status.mock.calls).toEqual([[200]]);
+    //   expect(res.status.mock.calls).toEqual([[200]]);
 
-      expect(res.send.mock.calls[0][0].token).toBeTruthy();
-      expect(res.send.mock.calls[0][0].refresh_token).toBeTruthy();
-      expect(res.send.mock.calls[0][0].nombre_completo).toBeTruthy();
+    //   expect(res.send.mock.calls[0][0].token).toBeTruthy();
+    //   expect(res.send.mock.calls[0][0].refresh_token).toBeTruthy();
+    //   expect(res.send.mock.calls[0][0].nombre_completo).toBeTruthy();
 
-      const token = res.send.mock.calls[0][0].token;
+    //   const token = res.send.mock.calls[0][0].token;
 
-      const resultToken = await new Promise((resolve, reject) => {
-        jwt.verify(token, secretToken, (err, decoded) => {
-          if (err) return resolve(false);
-          return resolve(decoded);
-        });
-      });
+    //   const resultToken = await new Promise((resolve, reject) => {
+    //     jwt.verify(token, secretToken, (err, decoded) => {
+    //       if (err) return resolve(false);
+    //       return resolve(decoded);
+    //     });
+    //   });
 
-      expect(resultToken.rut).toBe("10771131-7")
+    //   expect(resultToken.rut).toBe("10771131-7")
 
-      const refreshToken = res.send.mock.calls[0][0].refresh_token;
+    //   const refreshToken = res.send.mock.calls[0][0].refresh_token;
 
-      const resultRefreshToken = await new Promise((resolve, reject) => {
-        jwt.verify(refreshToken, secretRefreshToken, (err, decoded) => {
-          if (err) return resolve(false);
-          return resolve(decoded);
-        });
-      });
+    //   const resultRefreshToken = await new Promise((resolve, reject) => {
+    //     jwt.verify(refreshToken, secretRefreshToken, (err, decoded) => {
+    //       if (err) return resolve(false);
+    //       return resolve(decoded);
+    //     });
+    //   });
 
-      expect(resultRefreshToken.refreshTokenKey).toBeTruthy()
+    //   expect(resultRefreshToken.refreshTokenKey).toBeTruthy()
 
-      done();
-    });
+    //   done();
+    // });
     // it("Should not generate token with empty db", async (done) => {
     //   const req = {
     //     body: pacienteIngresado,
