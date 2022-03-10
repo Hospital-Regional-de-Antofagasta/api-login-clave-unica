@@ -27,10 +27,16 @@ exports.loginTest = async (req, res) => {
 
     const paciente = await validarPaciente(rut);
 
-    if (!paciente)
+    if (!paciente) {
+      if (process.env.NODE_ENV === "dev")
+        return res.status(401).send({
+          respuesta: await getMensajes("unauthorized"),
+          detalles: `${paciente}`,
+        });
       return res.status(401).send({
         respuesta: await getMensajes("unauthorized"),
       });
+    }
 
     const token = signToken(
       {
@@ -91,10 +97,16 @@ exports.login = async (req, res) => {
 
     const paciente = await validarPaciente(rut);
 
-    if (!paciente)
+    if (!paciente) {
+      if (process.env.NODE_ENV === "dev")
+        return res.status(401).send({
+          respuesta: await getMensajes("unauthorized"),
+          detalles: `${paciente}`,
+        });
       return res.status(401).send({
         respuesta: await getMensajes("unauthorized"),
       });
+    }
 
     const token = signToken(
       {
@@ -182,10 +194,16 @@ exports.refreshToken = async (req, res) => {
 
     const paciente = await getPacienteByRut(rutPaciente);
 
-    if (!paciente)
-      return res
-        .status(401)
-        .send({ respuesta: await getMensajes("unauthorized") });
+    if (!paciente) {
+      if (process.env.NODE_ENV === "dev")
+        return res.status(401).send({
+          respuesta: await getMensajes("unauthorized"),
+          detalles: `${paciente}`,
+        });
+      return res.status(401).send({
+        respuesta: await getMensajes("unauthorized"),
+      });
+    }
 
     if (oldRefreshToken.revoked)
       return res.status(401).send({
