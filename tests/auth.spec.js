@@ -90,43 +90,43 @@ describe("Endpoints auth", () => {
 
       done();
     });
-    it("Should not generate new token if the refresh token has been revoked", async (done) => {
-      const refresh_token = jwt.sign(
-        { refreshTokenKey: "I am revoked" },
-        secretRefreshToken
-      );
-      const response = await request
-        .post("/v1/auth/refresh-token")
-        .send({ refresh_token });
+    // it("Should not generate new token if the refresh token has been revoked", async (done) => {
+    //   const refresh_token = jwt.sign(
+    //     { refreshTokenKey: "I am revoked" },
+    //     secretRefreshToken
+    //   );
+    //   const response = await request
+    //     .post("/v1/auth/refresh-token")
+    //     .send({ refresh_token });
 
-      const mensaje = await getMensajes("unauthorizedRefresh");
+    //   const mensaje = await getMensajes("unauthorizedRefresh");
 
-      expect(response.status).toBe(401);
-      expect(response.body).toEqual({
-        respuesta: {
-          titulo: mensaje.titulo,
-          mensaje: mensaje.mensaje,
-          color: mensaje.color,
-          icono: mensaje.icono,
-        },
-      });
+    //   expect(response.status).toBe(401);
+    //   expect(response.body).toEqual({
+    //     respuesta: {
+    //       titulo: mensaje.titulo,
+    //       mensaje: mensaje.mensaje,
+    //       color: mensaje.color,
+    //       icono: mensaje.icono,
+    //     },
+    //   });
 
-      done();
-    });
-    it("Should generate new token", async (done) => {
-      const refresh_token = jwt.sign(
-        { refreshTokenKey: "I am a valid key" },
-        secretRefreshToken
-      );
-      const response = await request
-        .post("/v1/auth/refresh-token")
-        .send({ refresh_token });
+    //   done();
+    // });
+    // it("Should generate new token", async (done) => {
+    //   const refresh_token = jwt.sign(
+    //     { refreshTokenKey: "I am a valid key" },
+    //     secretRefreshToken
+    //   );
+    //   const response = await request
+    //     .post("/v1/auth/refresh-token")
+    //     .send({ refresh_token });
 
-      expect(response.status).toBe(200);
-      expect(response.body.token).toBeTruthy();
-      expect(response.body.refresh_token).toBeTruthy();
+    //   expect(response.status).toBe(200);
+    //   expect(response.body.token).toBeTruthy();
+    //   expect(response.body.refresh_token).toBeTruthy();
 
-      done();
-    });
+    //   done();
+    // });
   });
 });
