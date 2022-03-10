@@ -23,7 +23,7 @@
         NODE_ENV: "dev"
         I_JWT_KEY: ${{ secrets.I_JWT_KEY_QA }}
         I_JWT_KEY_REFRESH: ${{ secrets.I_JWT_KEY_REFRESH_QA }}
-        URL: ${{ secrets.API_URL_QA }}
+        API_URL: ${{ secrets.API_URL_QA }}
       steps:
         - name: Checkout
           uses: actions/checkout@v2
