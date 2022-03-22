@@ -43,7 +43,7 @@ exports.loginTest = async (req, res) => {
     const refreshTokenKey = uuidv4();
 
     const oldRefreshToken = await RefreshToken.findOne({
-      paciente: paciente._id,
+      paciente_id: paciente._id,
       revoked: null,
     }).exec();
 
@@ -115,7 +115,7 @@ exports.login = async (req, res) => {
     const refreshTokenKey = uuidv4();
 
     const oldRefreshToken = await RefreshToken.findOne({
-      paciente: paciente._id,
+      paciente_id: paciente._id,
       revoked: null,
     }).exec();
 

@@ -60,3 +60,6 @@ Thumbs.db
 build
 /.tests.*
 /key.json
+
+server.cert
+server.key
