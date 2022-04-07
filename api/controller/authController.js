@@ -27,9 +27,10 @@ exports.loginTest = async (req, res) => {
 
     const paciente = await validarPaciente(rut);
 
-    if (!paciente)
+    if (!paciente?._id)
       return res.status(401).send({
         respuesta: await getMensajes("unauthorized"),
+        detalles: `${paciente.name} - ${paciente.message}`,
       });
 
     const token = signToken(
@@ -91,7 +92,7 @@ exports.login = async (req, res) => {
 
     const paciente = await validarPaciente(rut);
 
-    if (!paciente)
+    if (!paciente?._id)
       return res.status(401).send({
         respuesta: await getMensajes("unauthorized"),
       });
@@ -182,10 +183,10 @@ exports.refreshToken = async (req, res) => {
 
     const paciente = await getPacienteByRut(rutPaciente);
 
-    if (!paciente)
-      return res
-        .status(401)
-        .send({ respuesta: await getMensajes("unauthorized") });
+    if (!paciente?._id)
+      return res.status(401).send({
+        respuesta: await getMensajes("unauthorized"),
+      });
 
     if (oldRefreshToken.revoked)
       return res.status(401).send({
@@ -243,7 +244,7 @@ const saveRefreshToken = async (key, rutPaciente, ipAddress) => {
 
 const validarPaciente = async (rut) => {
   let paciente = await getPacienteByRut(rut);
-  if (!paciente) {
+  if (!paciente?._id) {
     // los ruts tienen un 0 adelante a veces
     rut = `0${rut}`;
     paciente = await getPacienteByRut(rut);

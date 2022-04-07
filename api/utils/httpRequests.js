@@ -20,7 +20,6 @@ const httpRequestError = (status, data) => {
 };
 
 const httpRequest = async (method, url, params, config, cantIntentos) => {
-  console.log("httpRequest", url);
   if (method === "GET") {
     return await axios.get(url, config).catch(async (error) => {
       if (cantIntentos < 1) {

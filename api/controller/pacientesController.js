@@ -22,10 +22,6 @@ exports.getPacienteByRut = async (rutPaciente) => {
     },
   };
 
-  if (process.env.NODE_ENV === "test") {
-    return fakeGetPacientesByRut;
-  }
-
   const respuesta = await httpRequest(
     "GET",
     `${urlPacientes}/v1/pacientes/informacion?filter=rut`,
