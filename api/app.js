@@ -2,12 +2,25 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+var cookieParser = require('cookie-parser')
 const auth = require("./routes/auth");
+const authInterno = require("./routes/authInterno");
 const claveUnica = require("./routes/claveUnica");
 
 const app = express();
+
+var corsOptions = {
+  origin: true,
+  methods: ['GET', 'PUT', 'POST', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  // preflightContinue: true,
+  optionsSuccessStatus: 200,
+}
+
 app.use(express.json());
-app.use(cors());
+app.use(cors(corsOptions));
+app.use(cookieParser());
 
 const connection = process.env.MONGO_URI;
 const port = process.env.PORT;
@@ -23,6 +36,8 @@ app.get("/health", (req, res) => {
 });
 
 app.use("/v1/auth", auth);
+
+app.use("/v1/auth-interno", authInterno);
 
 app.use("/v1/clave-unica", claveUnica);
 

@@ -1,0 +1,23 @@
+{
+  "_id": "60832a43c8a4d50009607cab",
+  "nombreSocial": "",
+  "nombre": "JACQUELINE CLOTILDE",
+  "apellidoPaterno": "LAZO",
+  "apellidoMaterno": "ZAMBRA",
+  "detallesDireccion": "",
+  "direccionNumero": "",
+  "direccion": " ",
+  "direccionPoblacion": "",
+  "codigoComuna": "01",
+  "codigoCiudad": "03",
+  "codigoRegion": "01",
+  "telefonoFijo": "",
+  "telefonoMovil": "",
+  "correoCuerpo": "",
+  "correoExtension": "",
+  "codigosEstablecimientos": ["HRA"],
+  "datosContactoActualizados": false,
+  "createdAt": "2022-01-19T19:44:04.698Z",
+  "updatedAt": "2022-01-24T19:17:35.947Z",
+  "__v": 0
+}

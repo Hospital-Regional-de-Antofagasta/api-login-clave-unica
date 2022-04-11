@@ -60,6 +60,8 @@ exports.toapp = async (req, res, next) => {
       rut,
     };
 
+    // await cerrarSesionClaveUnica(access_token);
+
     next();
   } catch (error) {
     if (process.env.NODE_ENV === "dev")
@@ -110,6 +112,20 @@ const requestInfoUsuarioClaveUnica = async (access_token) => {
   );
 
   return response.data;
+};
+
+const cerrarSesionClaveUnica = async (access_token) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${access_token}`,
+    },
+  };
+
+  const response = await axios.get(
+    "https://accounts.claveunica.gob.cl/api/v1/accounts/app/logout",
+    {},
+    config
+  );
 };
 
 const signToken = (content, expiresIn, secret) => {

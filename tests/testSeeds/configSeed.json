@@ -18,6 +18,72 @@
         "mensaje": "Ocurrió un error inesperado. -test",
         "color": " -test",
         "icono": " -test"
+      },
+      "invalidLoginData": {
+        "titulo": "Usuario o contraseña incorrectos -test",
+        "mensaje": "El usuario o cpntraseña ingresados son incorrectos. -test",
+        "color": " -test",
+        "icono": " -test"
+      },
+      "invalidUserName": {
+        "titulo": "Usuario incorrecto -test",
+        "mensaje": "El usuario debe tener al menos 2 caracteres. -test",
+        "color": " -test",
+        "icono": " -test"
+      },
+      "invalidPassword": {
+        "titulo": "Contraseña incorrecta -test",
+        "mensaje": "La contraseña debe tener al menos un número, una letra mayuscula, una letra minuscula, un caracter especial(@$!%*?&) y al menos 6 caracteres. -test",
+        "color": " -test",
+        "icono": " -test"
+      },
+      "userCreated": {
+        "titulo": "Usuario Creado -test",
+        "mensaje": "El usuario fue creado con éxito. -test",
+        "color": " -test",
+        "icono": " -test"
+      },
+      "userAlredyExists": {
+        "titulo": "Usuario incorrecto -test",
+        "mensaje": "El usuario ingresado ya existe. -test",
+        "color": " -test",
+        "icono": " -test"
+      },
+      "forbiddenAccess": {
+        "titulo": "Acceso Denegado -test",
+        "mensaje": "Su sesión ha expirado. -test",
+        "color": " -test",
+        "icono": " -test"
+      },
+      "insufficientPermission": {
+        "titulo": "Acceso Denegado -test",
+        "mensaje": "No tiene los permisos para realizar esta acción. -test",
+        "color": " -test",
+        "icono": " -test"
+      },
+      "passwordChanged": {
+        "titulo": "Contraseña modificada -test",
+        "mensaje": "La contraseña fue modificada con éxito. -test",
+        "color": " -test",
+        "icono": " -test"
+      },
+      "userDeleted": {
+        "titulo": "Usuario eliminado -test",
+        "mensaje": "El usuario fue eliminado con éxito. -test",
+        "color": " -test",
+        "icono": " -test"
+      },
+      "adminExists": {
+        "titulo": "Ya existe un usuario administrador -test",
+        "mensaje": "So se puede crear un usuario administrador por defecto si no existe ninguno.  -test",
+        "color": "  -test",
+        "icono": "  -test"
+      },
+      "badRequest": {
+        "titulo": "Datos inválidos -test",
+        "mensaje": "Los datos enviados son inválidos. -test",
+        "color": " -test",
+        "icono": " -test"
       }
     },
     "version": 1

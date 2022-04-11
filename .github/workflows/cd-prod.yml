@@ -12,14 +12,17 @@
         KEY: ${{ secrets.GCP_KEY }}
         API_ZONE: ${{ secrets.GCP_ZONE_PROD }}
         API_CLUSTER: ${{ secrets.GCP_CLUSTER_PROD }}
-        API_KEY: ${{ secrets.API_KEY }}
+        API_KEY: ${{ secrets.API_KEY_PROD }}
         MONGO_IP: ${{ secrets.MONGO_IP_PROD }}
-        JWT_REFRESH_KEY: ${{ secrets.JWT_REFRESH_KEY }}
+        JWT_REFRESH_KEY: ${{ secrets.JWT_REFRESH_KEY_PROD }}
         CU_CLIENT_KEY: ${{ secrets.CU_CLIENT_KEY_PROD }}
         CU_SECRET_KEY: ${{ secrets.CU_SECRET_KEY_PROD }}
         CU_REDIRECT_URI: ${{ secrets.CU_REDIRECT_URI_PROD }}
-        CU_JWT_KEY: ${{ secrets.CU_JWT_KEY }}
+        CU_JWT_KEY: ${{ secrets.CU_JWT_KEY_PROD }}
         NODE_ENV: "prod"
+        I_JWT_KEY: ${{ secrets.I_JWT_KEY_PROD }}
+        I_JWT_KEY_REFRESH: ${{ secrets.I_JWT_KEY_REFRESH_PROD }}
+        URL: ${{ secrets.API_URL_PROD }}
       steps:
         - name: Checkout
           uses: actions/checkout@v2
@@ -38,6 +41,9 @@
             CLIENT_SECRET: "TEST"
             REDIRECT_URI: "http://redirect-uri/v1/clave-unica"
             JWT_SECRET_CLAVE_UNICA: "TEST"
+            JWT_SECRET_INTERNO: "TEST"
+            JWT_SECRET_REFRESH_TOKEN_INTERNO: "TEST"
+            API_URL: "TEST"
           run: |
             chmod +x ./gradlew
             ./gradlew helmInstallApiLoginClaveUnicaToCloud

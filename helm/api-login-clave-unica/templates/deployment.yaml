@@ -84,7 +84,21 @@ spec:
                 secretKeyRef:
                   name: {{ include "api-login-clave-unica.secrets" . }}
                   key: cu-jwt-key
-            
+            - name: JWT_SECRET_INTERNO
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "api-login-clave-unica.secrets" . }}
+                  key: i-jwt-key
+            - name: JWT_SECRET_REFRESH_TOKEN_INTERNO
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "api-login-clave-unica.secrets" . }}
+                  key: i-jwt-key-refresh
+            - name: API_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "api-login-clave-unica.secrets" . }}
+                  key: api-url
 
           {{- if .Values.resources }}
           resources:

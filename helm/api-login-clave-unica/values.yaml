@@ -22,6 +22,9 @@ secrets:
   cuSecretKey: ""
   cuRedirectUri: ""
   cuJwtKey: ""
+  iJwtKey: ""
+  iJwtKeyRefresh: ""
+  apiUrl: ""
 
 enviroment: prod
 
