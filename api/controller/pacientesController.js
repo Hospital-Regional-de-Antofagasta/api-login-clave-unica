@@ -30,8 +30,6 @@ exports.getPacienteByRut = async (rutPaciente) => {
     10
   );
 
-  console.log("respuesta", respuesta);
-
   if (!respuesta?.data) return respuesta;
 
   return respuesta.data;
