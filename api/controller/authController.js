@@ -36,7 +36,7 @@ exports.loginTest = async (req, res) => {
     const token = signToken(
       {
         _id: paciente._id,
-        rut: rut,
+        rut: paciente.rut,
       },
       expiresInTesting,
       secretToken
@@ -45,7 +45,7 @@ exports.loginTest = async (req, res) => {
     const refreshTokenKey = uuidv4();
 
     const oldRefreshToken = await RefreshToken.findOne({
-      rutPaciente: rut,
+      rutPaciente: paciente.rut,
       revoked: null,
     }).exec();
 
@@ -61,7 +61,7 @@ exports.loginTest = async (req, res) => {
       refreshTokenExpiresIn,
       secretRefreshToken
     );
-    await saveRefreshToken(refreshTokenKey, rut, ipAddress);
+    await saveRefreshToken(refreshTokenKey, paciente.rut, ipAddress);
 
     const nombrePaciente = paciente.nombreSocial
       ? [
@@ -100,7 +100,7 @@ exports.login = async (req, res) => {
     const token = signToken(
       {
         _id: paciente._id,
-        rut,
+        rut: paciente.rut,
       },
       expiresIn,
       secretToken
@@ -109,7 +109,7 @@ exports.login = async (req, res) => {
     const refreshTokenKey = uuidv4();
 
     const oldRefreshToken = await RefreshToken.findOne({
-      rutPaciente: rut,
+      rutPaciente: paciente.rut,
       revoked: null,
     }).exec();
 
@@ -125,7 +125,7 @@ exports.login = async (req, res) => {
       refreshTokenExpiresIn,
       secretRefreshToken
     );
-    await saveRefreshToken(refreshTokenKey, rut, ipAddress);
+    await saveRefreshToken(refreshTokenKey, paciente.rut, ipAddress);
 
     const nombrePaciente = paciente.nombreSocial
       ? [
