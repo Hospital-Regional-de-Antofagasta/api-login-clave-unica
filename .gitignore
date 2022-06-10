@@ -63,3 +63,5 @@ build
 
 server.cert
 server.key
+
+dev.Dockerfile
