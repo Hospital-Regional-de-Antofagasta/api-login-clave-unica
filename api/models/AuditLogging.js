@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const actions = [
   "/v1/auth-interno/registrar",
   "/v1/auth-interno/cambiar-contrasenia/:userName",
-  "/v1/auth-interno/eliminar-usuario/:userName"
+  "/v1/auth-interno/eliminar-usuario/:userName",
 ];
 
 const UsuariosInternos = mongoose.model(

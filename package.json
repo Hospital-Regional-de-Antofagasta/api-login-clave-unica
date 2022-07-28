@@ -32,7 +32,7 @@
     "babel-build": "./node_modules/.bin/babel . -d dist --ignore node_modules,tests,.vscode,./dist",
     "babel-dev": "nodemon --exec babel-node ./server.js",
     "clean": "rimraf ./build",
-    "test": "cross-env MONGO_URI=mongodb://localhost:27017 jest",
+    "test": "cross-env MONGO_URI=mongodb://localhost:27017 jest --runInBand",
     "test --watch": "jest --watch"
   },
   "repository": {
